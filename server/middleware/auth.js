@@ -4,13 +4,16 @@ const User = require('../models/User');
 module.exports = async (req, res, next) => {
   let token;
 
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
     try {
-      // Get token from header
       token = req.headers.authorization.split(' ')[1];
 
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'linkbooksecretjwtkey123');
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        console.error('JWT_SECRET is not defined');
+        return res.status(500).json({ success: false, message: 'Erreur de configuration serveur' });
+      }
+      const decoded = jwt.verify(token, secret);
 
       // Get user from the token, exclude password
       req.user = await User.findById(decoded.id).select('-password');

@@ -113,6 +113,12 @@ const loginUser = async (req, res) => {
     }
 
     // Check password
+    if (!user.password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Compte lié à Google, connectez-vous via Google'
+      });
+    }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ 
@@ -149,7 +155,7 @@ const getMe = async (req, res) => {
       user: userResponse(req.user)
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: 'Erreur lors de la connexion' });
   }
 };
 
@@ -251,15 +257,17 @@ const forgotPassword = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ success: false, message: 'Aucun compte avec cet email' });
+      return res.status(200).json({ success: true, message: 'Si cet email existe, un lien de réinitialisation a été envoyé.' });
     }
 
     const resetToken = crypto.randomBytes(32).toString('hex');
-    user.resetPasswordToken = resetToken;
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = Date.now() + 30 * 60 * 1000;
     await user.save();
 
-    const resetUrl = `http://localhost:5173/#reset-password?token=${resetToken}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/#reset-password?token=${resetToken}`;
 
     await sendEmail({
       to: email,
@@ -280,10 +288,10 @@ const forgotPassword = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Email de réinitialisation envoyé',
+      message: 'Si cet email existe, un lien de réinitialisation a été envoyé.',
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: 'Erreur lors de l\'envoi de l\'email' });
   }
 };
 
@@ -299,8 +307,9 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Mot de passe requis' });
     }
 
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
     const user = await User.findOne({
-      resetPasswordToken: req.params.token,
+      resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
     });
 

@@ -28,6 +28,10 @@ const upload = multer({
 });
 
 const uploadImages = (req, res, next) => {
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ success: false, message: 'Aucune image fournie' });
+  }
+
   const protocol = req.protocol;
   const host = req.get('host');
 

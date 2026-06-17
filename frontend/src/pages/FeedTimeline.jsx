@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FeedLayout, CategoryFilter, OfferCard } from '../layouts/SharedLayout';
+import { assetURL } from '../services/api';
 
 const API_BASE = 'http://localhost:5000/api';
 
@@ -36,7 +37,7 @@ export default function FeedTimeline() {
           {filtered.map(book => (
             <OfferCard
               key={book._id}
-              img={book.images?.[0] || '/images/3768ec8e8ce95737a750cad65a6be4ef.jpg'}
+              img={book.images?.[0] || assetURL('3768ec8e8ce95737a750cad65a6be4ef.jpg')}
               title={book.title}
               desc={book.subject ? `${book.subject}${book.level ? ' - ' + book.level : ''}` : ''}
               price={book.price ? `${book.price} DT` : book.type === 'don' ? 'Gratuit' : book.type === 'échange' ? 'Échange' : '-'}

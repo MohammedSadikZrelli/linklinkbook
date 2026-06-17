@@ -34,8 +34,8 @@ const BookSchema = new mongoose.Schema({
     default: ''
   },
   price: {
-    type: String,
-    default: ''
+    type: Number,
+    default: 0
   },
   type: {
     type: String,

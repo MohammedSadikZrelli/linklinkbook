@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FeedLayout, CategoryFilter } from '../layouts/SharedLayout';
-import { bookAPI, getUser } from '../services/api';
+import { bookAPI, getUser, assetURL } from '../services/api';
 
 export default function MyOffers() {
   const [books, setBooks] = useState([]);
@@ -109,10 +109,10 @@ export default function MyOffers() {
               <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
                 <div onClick={() => window.location.hash = `#offer-detail?id=${b._id}`} className="block w-full h-full cursor-pointer">
                   <img
-                    src={b.images?.[0] || '/images/9daa051ce6458b314a567b7df7c447a2.jpg'}
+                    src={b.images?.[0] || assetURL('9daa051ce6458b314a567b7df7c447a2.jpg')}
                     alt={b.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    onError={(e) => { e.target.src = '/images/9daa051ce6458b314a567b7df7c447a2.jpg'; }}
+                    onError={(e) => { e.target.src = assetURL('9daa051ce6458b314a567b7df7c447a2.jpg'); }}
                   />
                 </div>
                 <span className={`absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider pointer-events-none ${statusClass(b.status)}`}>{b.status}</span>
@@ -158,7 +158,7 @@ export default function MyOffers() {
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
                       <div className="h-9 w-9 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-                        <img src={b.images?.[0] || '/images/9daa051ce6458b314a567b7df7c447a2.jpg'} alt="" className="h-full w-full object-contain" onError={(e) => { e.target.src = '/images/9daa051ce6458b314a567b7df7c447a2.jpg'; }} />
+                        <img src={b.images?.[0] || assetURL('9daa051ce6458b314a567b7df7c447a2.jpg')} alt="" className="h-full w-full object-contain" onError={(e) => { e.target.src = assetURL('9daa051ce6458b314a567b7df7c447a2.jpg'); }} />
                       </div>
                       <span className="text-sm font-bold text-gray-900">{b.title}</span>
                     </div>

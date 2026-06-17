@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FeedLayout, OfferCard } from '../layouts/SharedLayout';
+import { assetURL } from '../services/api';
 
 export default function UserProfile() {
   const [activeTab, setActiveTab] = useState('Offres');
@@ -10,7 +11,7 @@ export default function UserProfile() {
       id: 1,
       title: 'Livres Math 3ème',
       desc: 'Collection complète de manuels scolaires de la 3ème année math en Tunisie.',
-      img: '/images/694c9a85f499a9880071f476006a4730.png',
+      img: assetURL('694c9a85f499a9880071f476006a4730.png'),
       tag: 'Etudiant',
       price: 'Échange'
     },
@@ -18,7 +19,7 @@ export default function UserProfile() {
       id: 2,
       title: 'Physique 3ème Année',
       desc: 'Livre d\'exercices corrigés de physique pour la 3ème année secondaire.',
-      img: '/images/9daa051ce6458b314a567b7df7c447a2.jpg',
+      img: assetURL('9daa051ce6458b314a567b7df7c447a2.jpg'),
       tag: 'Etudiant',
       price: '15 DT'
     },
@@ -26,7 +27,7 @@ export default function UserProfile() {
       id: 3,
       title: 'Sciences de la Vie 3ème',
       desc: 'Manuel officiel tunisien de SVT pour la section scientifique.',
-      img: '/images/e3049545b879d2927084c2fc641be246.png',
+      img: assetURL('e3049545b879d2927084c2fc641be246.png'),
       tag: 'Etudiant',
       price: 'Échange'
     }

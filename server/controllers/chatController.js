@@ -6,7 +6,10 @@ const Message = require('../models/Message');
 // --- AI Chatbot Section ---
 
 // Get API Key from Environment
-const apiKey = process.env.GEMINI_API_KEY || "AIzaSyDlafup-7UyiW3IVsVEglkIFSBONbqHYV0"; 
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  console.warn('⚠ GEMINI_API_KEY not set — AI chatbot will use fallback mode');
+} 
 const genAI = new GoogleGenerativeAI(apiKey);
 
 exports.askChatbot = async (req, res) => {
@@ -19,7 +22,7 @@ exports.askChatbot = async (req, res) => {
     let parsed = null;
 
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
       const systemInstruction = `
       Tu es l'assistant de LinkBook. Extrait les infos de recherche de livres.
       Retourne UNIQUEMENT un JSON:

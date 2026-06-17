@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FeedLayout } from '../layouts/SharedLayout';
+import { assetURL } from '../services/api';
 
 export default function OfferDetail() {
   const [proposals, setProposals] = useState([
@@ -7,11 +8,11 @@ export default function OfferDetail() {
       id: 1,
       name: 'Mohamed Truki',
       time: 'Il y a 2 heures',
-      avatar: '/images/d238c6a07f71439c16b328d71ead5416.jpg',
+      avatar: assetURL('d238c6a07f71439c16b328d71ead5416.jpg'),
       proposalDesc: 'Je vous propose un échange contre mes livres de 4ème année Math en parfait état. Voir les photos ci-jointes.',
       proposedImages: [
-        '/images/694c9a85f499a9880071f476006a4730.png',
-        '/images/e3049545b879d2927084c2fc641be246.png'
+        assetURL('694c9a85f499a9880071f476006a4730.png'),
+        assetURL('e3049545b879d2927084c2fc641be246.png')
       ],
       status: 'En attente'
     },
@@ -71,12 +72,12 @@ export default function OfferDetail() {
           {/* Left: Book Cover Image */}
           <div className="relative h-64 md:h-80 bg-white rounded-2xl overflow-hidden border border-gray-100 flex items-center justify-center">
             <img 
-              src="/images/694c9a85f499a9880071f476006a4730.png" 
+              src={assetURL('694c9a85f499a9880071f476006a4730.png')}
               alt="Livres 3ème Années" 
               className="max-h-full max-w-full object-contain p-4 hover:scale-105 transition-transform duration-300"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = '/images/9daa051ce6458b314a567b7df7c447a2.jpg';
+                e.target.src = assetURL('9daa051ce6458b314a567b7df7c447a2.jpg');
               }}
             />
           </div>
@@ -187,7 +188,7 @@ export default function OfferDetail() {
                           alt="Proposé"
                           onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src = '/images/9daa051ce6458b314a567b7df7c447a2.jpg';
+                            e.target.src = assetURL('9daa051ce6458b314a567b7df7c447a2.jpg');
                           }}
                         />
                       </div>

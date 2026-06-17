@@ -36,6 +36,7 @@ app.use('/api/upload', require('./routes/upload'));
 app.use('/api/notifications', require('./routes/notification'));
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/payments', require('./routes/payment'));
+app.use('/api/assets', require('./routes/asset'));
 
 // Import error handling middlewares
 const { errorHandler, notFoundHandler } = require('./middleware/error');

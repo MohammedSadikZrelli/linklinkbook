@@ -94,7 +94,7 @@ export function Navbar({ transparent = false }) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-2 flex-shrink-0 cursor-pointer" onClick={() => window.location.hash = '#'}>
-            <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-8 w-auto object-contain" alt="Linkbook" />
+            <img src="http://localhost:5000/api/assets/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-8 w-auto object-contain" alt="Linkbook" />
             <span className={`font-black text-xl tracking-tight ${transparent ? 'text-white' : 'text-[#2777df]'}`}>Linkbook</span>
           </div>
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { FeedLayout } from '../layouts/SharedLayout';
+import { assetURL } from '../services/api';
 
 export default function ProductDetail() {
   return (
@@ -8,12 +9,12 @@ export default function ProductDetail() {
         {/* Image Gallery */}
         <div>
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden mb-4">
-            <div className="h-80 bg-gray-100"><img src="/images/9daa051ce6458b314a567b7df7c447a2.jpg" alt="Livres math" className="w-full h-full object-cover" /></div>
+            <div className="h-80 bg-gray-100"><img src={assetURL('9daa051ce6458b314a567b7df7c447a2.jpg')} alt="Livres math" className="w-full h-full object-cover" /></div>
           </div>
           <div className="grid grid-cols-4 gap-2">
-            {['/images/9daa051ce6458b314a567b7df7c447a2.jpg', '/images/a6bb132d342bb33f433dccca87759b72.jpg', '/images/e63275cd7203a0496c3210915dd1b6d1.jpg', '/images/c31c63442f66c9d7210942c880fd4638.jpg'].map((img, i) => (
+            {['9daa051ce6458b314a567b7df7c447a2.jpg', 'a6bb132d342bb33f433dccca87759b72.jpg', 'e63275cd7203a0496c3210915dd1b6d1.jpg', 'c31c63442f66c9d7210942c880fd4638.jpg'].map((img, i) => (
               <div key={i} className={`h-20 rounded-2xl overflow-hidden cursor-pointer border-2 transition-all ${i === 0 ? 'border-[#2777df]' : 'border-transparent hover:border-gray-300'}`}>
-                <img src={img} alt="" className="w-full h-full object-cover" />
+                <img src={assetURL(img)} alt="" className="w-full h-full object-cover" />
               </div>
             ))}
           </div>

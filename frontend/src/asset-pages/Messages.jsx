@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FeedLayout } from '../layouts/SharedLayout';
+import { assetURL } from '../services/api';
 
 export default function Messages() {
   const [contacts, setContacts] = useState([
@@ -43,8 +44,8 @@ export default function Messages() {
         time: '13:11 PM',
         text: 'Lorem Ipsum est simplement un faux texte de l\'industrie de l\'impression et de la composition. Le Lorem Ipsum est le texte factice standard de l\'industrie depuis les années 1500, lorsqu\'un imprimeur inconnu a pris une galère de caractères et l\'a brouillé pour en faire un livre de spécimens de caractères.',
         attachments: [
-          '/images/694c9a85f499a9880071f476006a4730.png',
-          '/images/e3049545b879d2927084c2fc641be246.png'
+          assetURL('694c9a85f499a9880071f476006a4730.png'),
+          assetURL('e3049545b879d2927084c2fc641be246.png')
         ]
       },
       {
@@ -195,9 +196,9 @@ export default function Messages() {
                                     src={img} 
                                     className="max-h-full max-w-full object-contain rounded-lg" 
                                     alt="Pièce jointe"
-                                    onError={(e) => {
+                                      onError={(e) => {
                                       e.target.onerror = null;
-                                      e.target.src = '/images/9daa051ce6458b314a567b7df7c447a2.jpg';
+                                      e.target.src = assetURL('9daa051ce6458b314a567b7df7c447a2.jpg');
                                     }}
                                   />
                                 </div>

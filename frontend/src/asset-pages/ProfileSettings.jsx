@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FeedLayout } from '../layouts/SharedLayout';
+import { assetURL } from '../services/api';
 
 export default function ProfileSettings() {
   const [profile, setProfile] = useState({
@@ -8,7 +9,7 @@ export default function ProfileSettings() {
     gender: 'Homme',
     phone: '+216 21 640 651',
     address: 'Sfax, Tunisie',
-    photo: '/images/d238c6a07f71439c16b328d71ead5416.jpg'
+    photo: assetURL('d238c6a07f71439c16b328d71ead5416.jpg')
   });
 
   const [saving, setSaving] = useState(false);

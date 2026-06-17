@@ -114,6 +114,13 @@ export const paymentAPI = {
   approveRecharge: (id) => request('PUT', `/payments/recharge/${id}/approve`),
 };
 
+// Asset helpers — images stored in MongoDB
+export const assetURL = (filename) => `${API_BASE}/assets/${filename}`;
+
+export const assetAPI = {
+  getAll: () => request('GET', '/assets'),
+};
+
 // Admin endpoints
 export const adminAPI = {
   getStats:      ()          => request('GET',    '/admin/stats'),

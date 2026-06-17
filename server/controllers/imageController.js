@@ -337,19 +337,34 @@ const analyzeImage = async (req, res, next) => {
 
     // 5. Generate AI Cover URL
     // 5. Generate AI Cover URL using Custom Cloudflare Worker
-    const CLOUDFLARE_WORKER_URL = "https://linkbook.saddikzrelli10.workers.dev/";
-    const CLOUDFLARE_API_KEY = process.env.IMAGE_GENERATION_API_KEY || "12345678";
+    const CLOUDFLARE_WORKER_URL = process.env.CLOUDFLARE_WORKER_URL || "https://linkbook.saddikzrelli10.workers.dev/";
+    const CLOUDFLARE_API_KEY = process.env.IMAGE_GENERATION_API_KEY;
     let aiCoverUrl = null;
 
-    if (CLOUDFLARE_API_KEY) {
+    if (CLOUDFLARE_WORKER_URL && CLOUDFLARE_API_KEY) {
       try {
-        console.log("Generating cover with Cloudflare Worker...");
+        const cfRes = await fetch(CLOUDFLARE_WORKER_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': CLOUDFLARE_API_KEY,
+          },
+          body: JSON.stringify({
+            title: parsedMetadata.title || 'Livre',
+            subject: parsedMetadata.subject || '',
+            visualDesign: parsedMetadata.visual_design || '',
+          }),
+        });
+        if (cfRes.ok) {
+          const cfData = await cfRes.json();
+          aiCoverUrl = cfData.url || cfData.imageUrl || null;
+        }
       } catch (err) {
         console.error("Failed to generate CF cover:", err.message);
-        aiCoverUrl = `https://placehold.co/600x800/2777df/ffffff/png?text=${encodeURIComponent(parsedMetadata.title || 'Livre')}&font=roboto`;
       }
-    } else {
-      // Fallback to placehold if no API key is set
+    }
+
+    if (!aiCoverUrl) {
       aiCoverUrl = `https://placehold.co/600x800/2777df/ffffff/png?text=${encodeURIComponent(parsedMetadata.title || 'Livre')}&font=roboto`;
     }
 
