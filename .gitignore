@@ -17,6 +17,9 @@ out/
 .env.test.local
 .env.production.local
 
+# Uploaded files
+server/uploads/
+
 # Editor & OS files
 .DS_Store
 Thumbs.db
