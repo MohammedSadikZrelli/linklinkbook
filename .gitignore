@@ -19,6 +19,8 @@ out/
 
 # Uploaded files
 server/uploads/
+open/
+screenshoot/
 
 # Editor & OS files
 .DS_Store
