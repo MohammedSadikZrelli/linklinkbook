@@ -1,0 +1,26 @@
+{
+  "name": "linkbook-server",
+  "version": "1.0.0",
+  "description": "MERN Backend for Linkbook Tunisian student book exchange platform",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@heyputer/puter.js": "^2.5.3",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.2.1",
+    "multer": "^2.1.1",
+    "nodemailer": "^8.0.8",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "sharp": "^0.34.5"
+  }
+}

@@ -1,0 +1,248 @@
+import React, { useState } from 'react';
+import { authAPI, saveToken, saveUser } from '../services/api';
+
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const data = await authAPI.login({ email, password });
+      saveToken(data.token);
+      saveUser(data.user);
+      window.location.hash = '#timeline';
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen w-full flex bg-gray-50 font-sans" style={{ fontFamily: "'Inter', sans-serif" }}>
+      
+      {/* LEFT SIDE: Brand Showcase (Hidden on Mobile) */}
+      <div 
+        className="relative hidden lg:flex lg:w-[55%] flex-col justify-between p-16 bg-cover bg-center overflow-hidden"
+        style={{ backgroundImage: "url('/images/3768ec8e8ce95737a750cad65a6be4ef.jpg')" }}
+      >
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#185db4]/90 via-[#2777df]/70 to-[#2777df]/30 z-0"></div>
+
+        {/* Brand Header */}
+        <div className="relative z-10 flex items-center gap-3">
+          <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-10 w-auto object-contain brightness-0 invert" alt="Linkbook Logo" />
+          <span className="text-white font-black text-2xl tracking-wide">Linkbook</span>
+        </div>
+
+        {/* Brand Slogan / Glass Card */}
+        <div className="relative z-10 bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 max-w-xl shadow-2xl">
+          <span className="inline-block bg-[#fc4d16]/30 text-orange-200 text-xs px-3 py-1 rounded-full font-bold tracking-wider uppercase mb-4">
+            Nouveau sur la plateforme
+          </span>
+          <h2 className="text-white text-3xl font-black mb-3 leading-snug">
+            Connectez-vous et découvrez les meilleures opportunités.
+          </h2>
+          <p className="text-blue-100 text-sm leading-relaxed">
+            Rejoignez une communauté dynamique de professionnels et boostez vos transactions en toute sécurité sur notre plateforme exclusive.
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="relative z-10 text-white/50 text-xs">
+          Copyright © 2026 Linkbook. Tous droits réservés.
+        </div>
+      </div>
+
+      {/* RIGHT SIDE: Interactive Login Card */}
+      <div className="w-full lg:w-[45%] flex flex-col justify-center items-center p-6 sm:p-12 md:p-16 bg-white relative">
+        
+        {/* Back to Home */}
+        <a href="#" className="absolute top-6 left-6 flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-[#2777df] transition-colors">
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+          Retour à l'accueil
+        </a>
+        
+        {/* Form Container */}
+        <div className="w-full max-w-md flex flex-col items-center">
+          
+          {/* Logo & Headings */}
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="h-16 w-16 p-3 rounded-2xl bg-[#2777df]/5 flex items-center justify-center mb-4">
+              <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-10 w-auto object-contain" alt="Linkbook" />
+            </div>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Connexion</h1>
+            <p className="text-sm text-gray-500 mt-2 font-medium">Bienvenue sur notre plateforme</p>
+          </div>
+
+          {/* Login Form */}
+          <form className="w-full" onSubmit={handleSubmit}>
+
+            {/* Error Banner */}
+            {error && (
+              <div className="mb-5 p-3.5 bg-red-50 border border-red-200 text-red-600 rounded-2xl text-xs font-bold flex items-center gap-2">
+                <svg className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z" /></svg>
+                {error}
+              </div>
+            )}
+
+            {/* Email Field */}
+
+            <div className="mb-5">
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                Adresse Email
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+                  </svg>
+                </div>
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="exemple@email.com" 
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:border-[#2777df] focus:ring-4 focus:ring-blue-100 outline-none transition-all text-sm text-gray-800 placeholder-gray-400"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div className="mb-4">
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                Mot de passe
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                  </svg>
+                </div>
+                <input 
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••" 
+                  className="w-full pl-11 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:border-[#2777df] focus:ring-4 focus:ring-blue-100 outline-none transition-all text-sm text-gray-800 placeholder-gray-400"
+                  required
+                />
+                {/* Visibility Toggle */}
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#2777df] outline-none transition-all"
+                >
+                  {showPassword ? (
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.882 9.882L9.9 9.9m1.73-3.23a9.956 9.956 0 014.54 1.814m2.913 8.303a9.793 9.793 0 01-3 3m-3-3l.85-2.02m0 0l-1.397-1.397M6 16H3a2 2 0 00-2 2v3h6v-3a2 2 0 00-2-2zM15 13a3 3 0 11-6 0 3 3 0 016 0zm-9 9a2 2 0 00-2 2v3h6v-3a2 2 0 00-2-2z"></path>
+                    </svg>
+                  ) : (
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between mb-6">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 rounded-md border-gray-300 text-[#2777df] focus:ring-[#2777df]" 
+                />
+                <span className="text-xs font-semibold text-gray-500">Se souvenir de moi</span>
+              </label>
+              <a 
+                href="#forgot-password" 
+                className="text-xs font-bold text-[#fc4d16] hover:text-[#e03d0d] tracking-wider uppercase transition-colors"
+              >
+                Mot de passe oublié ?
+              </a>
+            </div>
+
+            {/* Submit Button */}
+            <button 
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 bg-[#2777df] hover:bg-[#185db4] disabled:bg-blue-300 text-white rounded-2xl font-bold active:scale-[0.98] transform transition-all shadow-lg shadow-[#2777df]/20 text-sm flex items-center justify-center gap-2 outline-none"
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Connexion en cours...</span>
+                </>
+              ) : (
+                'Connexion'
+              )}
+            </button>
+          </form>
+
+          {/* Separator */}
+          <div className="relative w-full flex items-center justify-center my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-100"></div>
+            </div>
+            <span className="relative z-10 bg-white px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">OU</span>
+          </div>
+
+          {/* Social Logins */}
+          <div className="flex flex-col gap-3.5 w-full">
+            
+            {/* Google Button */}
+            <a 
+              href="http://localhost:5000/api/auth/google"
+              className="w-full py-3 px-4 border border-gray-200 rounded-2xl flex items-center justify-center gap-3 hover:bg-gray-50 active:scale-[0.99] transition-all text-sm font-bold text-gray-600 outline-none"
+            >
+              {/* Google Brand SVG */}
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              <span>Se connecter avec Google</span>
+            </a>
+
+            {/* Facebook Button */}
+            <button 
+              type="button" 
+              className="w-full py-3 px-4 border border-gray-200 rounded-2xl flex items-center justify-center gap-3 hover:bg-gray-50 active:scale-[0.99] transition-all text-sm font-bold text-gray-600 outline-none"
+            >
+              {/* Facebook Brand SVG */}
+              <svg className="h-5 w-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              <span>Se connecter avec Facebook</span>
+            </button>
+          </div>
+
+          {/* Footer Navigation */}
+          <div className="mt-8 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">
+            Nouveau sur Linkbook ? 
+            <a href="#register" className="text-[#fc4d16] hover:text-[#e03d0d] ml-1 transition-colors">Créer un compte</a>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
