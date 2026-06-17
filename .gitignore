@@ -9,3 +9,7 @@ frontend/public/images/
 .DS_Store
 Thumbs.db
 ~$*.docx
+# Additional ignores for large generated assets
+**/node_modules/
+frontend/dist/
+plan/**/open/*.xd
