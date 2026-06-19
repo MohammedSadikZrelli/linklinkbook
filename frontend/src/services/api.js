@@ -1,5 +1,5 @@
 // Central API config — all requests go to the Express backend
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Store token in localStorage
 export const saveToken = (token) => localStorage.setItem('linkbook_token', token);
