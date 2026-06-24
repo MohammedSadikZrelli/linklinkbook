@@ -62,14 +62,17 @@ Format de reponse STRICT (JSON uniquement):
 }
 
 Exemples:
-"Je cherche un livre de maths" → intent: ask_info, reply: "Pour quel niveau ?"
-"Je cherche maths 3eme" → intent: search, reply: "Je cherche des livres de maths pour la 3eme..."
-"Bonjour" → intent: chat, reply: "Bonjour ! Je suis l'assistant LinkBook..."
-"Je veux vendre un livre" → intent: action, actionType: "create-offer", reply: "Pour creer une offre..."
-"Sfax" (contexte: sujet=maths, niveau=3eme) → intent: search`;
+"math 3eme" → intent: search, searchParams: { subject: "maths", level: "3eme" }
+"Je cherche maths 3eme" → intent: search, searchParams: { subject: "maths", level: "3eme" }
+"physique bac" → intent: search, searchParams: { subject: "physique", level: "bac" }
+"Je cherche un livre de maths" → intent: ask_info, reply: "Pour quel niveau ?", searchParams: { subject: "maths" }
+"je veux des maths" → intent: ask_info, reply: "Pour quel niveau ?", searchParams: { subject: "maths" }
+"3eme" → intent: ask_info, reply: "Pour quel sujet ?", searchParams: { level: "3eme" }
+"Bonjour" → intent: chat
+"Je veux vendre un livre" → intent: action, actionType: "create-offer"`;
 
 
-        const model = process.env.NVIDIA_MODEL || "meta/llama-3.2-3b-instruct";
+        const model = process.env.NVIDIA_MODEL || "meta/llama-3.1-8b-instruct";
 
         const prompt = buildPrompt(message, currentParams, history);
 
