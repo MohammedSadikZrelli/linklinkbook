@@ -106,10 +106,10 @@ export default function Messages() {
 
   return (
     <FeedLayout active="Mes contacts" title="Messages">
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden h-[850px] flex">
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden h-[calc(100vh-180px)] min-h-[400px] flex">
         
         {/* Contacts Sidebar List (Left Panel) */}
-        <div className="w-full md:w-80 border-r border-gray-100 flex flex-col flex-shrink-0 bg-white">
+        <div className={`w-full md:w-80 border-r border-gray-100 flex-col flex-shrink-0 bg-white ${activeConversationId ? 'hidden md:flex' : 'flex'}`}>
           <div className="p-4 border-b border-gray-100">
             <div className="relative">
               <svg className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,12 +169,15 @@ export default function Messages() {
         </div>
 
         {/* Chat Window Details (Right Panel) */}
-        <div className="hidden md:flex flex-col flex-1 bg-white">
+        <div className={`flex-col flex-1 bg-white ${activeConversationId ? 'flex' : 'hidden md:flex'}`}>
           {activeConversationId ? (
             <>
               {/* Header info */}
               <div className="p-4 bg-white border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-3">
+                  <button onClick={() => setActiveConversationId(null)} className="md:hidden p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                  </button>
                   <div className="h-10 w-10 rounded-full bg-blue-100 text-[#2777df] font-black text-xs flex items-center justify-center overflow-hidden">
                     {otherParticipant?.avatar ? <img src={otherParticipant.avatar} className="h-full w-full object-cover" alt="" /> : getInitials(otherParticipant?.name)}
                   </div>

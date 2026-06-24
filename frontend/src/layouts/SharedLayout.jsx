@@ -98,21 +98,6 @@ export function Navbar({ transparent = false }) {
             <span className={`font-black text-xl tracking-tight ${transparent ? 'text-white' : 'text-[#2777df]'}`}>Linkbook</span>
           </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {NAV_MAP.map(link => {
-              // Hide private nav links from non-authenticated users
-              const isPrivate = link.hash !== '#' && link.hash !== '#pricing';
-              if (!isAuthenticated && isPrivate) return null;
-              return (
-                <a key={link.label} href={link.hash}
-                  className={`px-3 py-2 rounded-xl text-sm font-bold transition-all ${transparent ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
-                  {link.label}
-                </a>
-              );
-            })}
-          </nav>
-
           {/* Center Search — Type + Wilaya */}
           {isAuthenticated && (
             <div className={`hidden md:flex items-center gap-1.5 rounded-xl px-3 py-1.5 flex-1 max-w-sm mx-4 ${transparent ? 'bg-white/10 border border-white/20' : 'bg-gray-50 border border-gray-200'}`}>
@@ -176,7 +161,7 @@ export function Navbar({ transparent = false }) {
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                   </button>
                   {notifOpen && (
-                    <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white border border-gray-100 shadow-xl z-50 max-h-96 overflow-y-auto">
+                    <div className="absolute right-0 sm:right-auto mt-2 w-80 max-w-[90vw] rounded-2xl bg-white border border-gray-100 shadow-xl z-50 max-h-96 overflow-y-auto">
                       <div className="px-4 py-3 border-b border-gray-50">
                         <p className="text-xs font-black text-gray-900">Notifications</p>
                       </div>
@@ -311,15 +296,20 @@ export function Navbar({ transparent = false }) {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 px-4 py-3 space-y-1 shadow-lg">
-          {NAV_MAP.map(link => {
-            const isPrivate = link.hash !== '#' && link.hash !== '#pricing';
-            if (!isAuthenticated && isPrivate) return null;
-            return (
-              <a key={link.label} href={link.hash} className="block px-3 py-2 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50">{link.label}</a>
-            );
-          })}
-          {!isAuthenticated && (
-            <div className="pt-2 border-t border-gray-100 flex flex-col gap-2">
+          {isAuthenticated ? (
+            <>
+              {[...SIDEBAR_ITEMS, ...(isAdmin ? [{ label: 'Admin Panel', hash: '#admin-dashboard', icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg> }] : [])].map(item => (
+                <a key={item.label} href={item.hash} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all">
+                  <span className="text-gray-400 flex-shrink-0">{item.icon}</span>
+                  {item.label}
+                </a>
+              ))}
+              <div className="pt-2 border-t border-gray-100">
+                <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition-all">Déconnexion</button>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col gap-2">
               <a href="#login" className="block text-center px-4 py-2.5 text-sm font-bold text-[#2777df] bg-blue-50/50 hover:bg-blue-50 rounded-xl transition-all">Connexion</a>
               <a href="#register" className="block text-center px-4 py-2.5 text-sm font-black bg-[#fc4d16] hover:bg-[#e03d0d] text-white rounded-xl transition-all">S'inscrire</a>
             </div>

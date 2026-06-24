@@ -197,7 +197,7 @@ export default function CreateOffer() {
             {/* Image Upload with AI */}
             <div>
               <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Photo du livre</label>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {images.length === 0 && (
                   <label className="col-span-4 aspect-video rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#2777df] flex flex-col items-center justify-center cursor-pointer transition-colors bg-gray-50 hover:bg-[#2777df]/5">
                     <svg className="h-10 w-10 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -255,7 +255,7 @@ export default function CreateOffer() {
                     <label className="block text-[11px] font-black text-gray-500 uppercase tracking-wider">
                       Sélectionnez la couverture finale
                     </label>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {/* 1. Enhanced photo */}
                       <div 
                         onClick={() => setSelectedCover(coverOptions.enhanced)}
@@ -347,7 +347,7 @@ export default function CreateOffer() {
             </div>
 
             {/* Author + ISBN */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Auteur</label>
                 <input value={form.author} onChange={update('author')} placeholder="Ex: Sami Ben Ali" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:border-[#2777df] focus:ring-4 focus:ring-blue-100 outline-none text-sm transition-all" />
@@ -365,7 +365,7 @@ export default function CreateOffer() {
             </div>
 
             {/* Subject + Level */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Matière *</label>
                 <select value={form.subject} onChange={update('subject')} required className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:border-[#2777df] focus:ring-4 focus:ring-blue-100 outline-none text-sm transition-all">
@@ -383,7 +383,7 @@ export default function CreateOffer() {
             </div>
 
             {/* Type + Condition */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Type *</label>
                 <select value={form.type} onChange={update('type')} required className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:border-[#2777df] focus:ring-4 focus:ring-blue-100 outline-none text-sm transition-all">
@@ -398,7 +398,7 @@ export default function CreateOffer() {
                   {['Neuf', 'Bon état', 'Usagé'].map(etat => (
                     <label key={etat} className={`cursor-pointer rounded-2xl border-2 p-3 text-center transition-all ${form.condition === etat ? 'border-[#2777df] bg-[#2777df]/5 shadow-sm' : 'border-gray-100 bg-gray-50 hover:border-gray-200'}`}>
                       <input type="radio" name="condition" value={etat} checked={form.condition === etat} onChange={update('condition')} className="hidden" />
-                      <span className={`text-xs font-bold ${form.condition === etat ? 'text-[#2777df]' : 'text-gray-500'}`}>{etat}</span>
+                      <span className={`text-[10px] sm:text-xs font-bold ${form.condition === etat ? 'text-[#2777df]' : 'text-gray-500'}`}>{etat}</span>
                     </label>
                   ))}
                 </div>
@@ -406,7 +406,7 @@ export default function CreateOffer() {
             </div>
 
             {/* Price + Location */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Prix</label>
                 <input value={form.price} onChange={update('price')} placeholder="Ex: 20 DT" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:border-[#2777df] focus:ring-4 focus:ring-blue-100 outline-none text-sm transition-all" disabled={form.type === 'don'} />

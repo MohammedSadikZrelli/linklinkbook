@@ -141,7 +141,8 @@ export default function MyOffers() {
         </div>
       ) : (
         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-          <table className="w-full">
+            <div className="overflow-x-auto">
+            <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
                 <th className="text-left py-3 px-4 text-xs font-bold text-gray-400 uppercase">Offre</th>
@@ -180,7 +181,8 @@ export default function MyOffers() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+            </div>
         </div>
       )}
     </FeedLayout>
