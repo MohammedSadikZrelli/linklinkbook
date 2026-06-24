@@ -11,8 +11,8 @@ const protect = require('../middleware/auth');
 const { validate, validateParams, idParam } = require('../validators');
 const { askChatbotSchema, startConversationSchema, sendMessageSchema } = require('../validators/chat');
 
-// AI Chatbot
-router.post('/ask', protect, validate(askChatbotSchema), askChatbot);
+// AI Chatbot — hybrid auth (works without token, personalizes if present)
+router.post('/ask', validate(askChatbotSchema), askChatbot);
 
 // Peer-to-Peer
 router.get('/conversations', protect, getConversations);

@@ -102,7 +102,7 @@ export const chatAPI = {
   getMessages: (id) => request('GET', `/chat/messages/${id}`),
   sendMessage: (payload) => request('POST', '/chat/messages', payload),
   startConversation: (participantId) => request('POST', '/chat/conversations', { participantId }),
-  askAI: (message) => request('POST', '/chat/ask', { message }),
+  askAI: (payload) => request('POST', '/chat/ask', payload),
 };
 
 // Payment endpoints

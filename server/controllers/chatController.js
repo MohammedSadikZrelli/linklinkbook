@@ -87,7 +87,7 @@ Utilisateur: "Je veux vendre un livre" / "Je veux creer une offre" / "Publier un
 IMPORTANT: Ne reponds JAMAIS avec des informations inventees. Si tu ne sais pas, dis-le.`;
 
         const prompt = buildPrompt(message, currentParams, history);
-        const model = process.env.NVIDIA_MODEL || "qwen/qwen3.5-122b-a10b";
+        const model = process.env.NVIDIA_MODEL || "meta/llama-3.2-3b-instruct";
 
         const messages = [
           { role: "user", content: systemInstruction + "\n\n" + prompt }
@@ -112,10 +112,29 @@ IMPORTANT: Ne reponds JAMAIS avec des informations inventees. Si tu ne sais pas,
         );
 
         let content = response.data.choices[0].message.content;
-        const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-        if (jsonMatch) content = jsonMatch[1];
 
-        parsed = JSON.parse(content);
+        // Strip markdown code blocks
+        const codeBlock = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        if (codeBlock) content = codeBlock[1];
+
+        // Find the first complete JSON object (handles trailing text)
+        const start = content.indexOf('{');
+        if (start === -1) throw new Error("No JSON object in response");
+
+        let depth = 0, inString = false, escaped = false, end = -1;
+        for (let i = start; i < content.length; i++) {
+          const ch = content[i];
+          if (escaped) { escaped = false; continue; }
+          if (ch === '\\' && inString) { escaped = true; continue; }
+          if (ch === '"') { inString = !inString; continue; }
+          if (!inString) {
+            if (ch === '{') depth++;
+            if (ch === '}') { depth--; if (depth === 0) { end = i + 1; break; } }
+          }
+        }
+        if (end === -1) throw new Error("Unterminated JSON object");
+
+        parsed = JSON.parse(content.slice(start, end));
       } else {
         throw new Error("NVIDIA_API_KEY not set");
       }
