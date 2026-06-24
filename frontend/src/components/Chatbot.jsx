@@ -50,6 +50,7 @@ export default function Chatbot() {
         sender: 'bot',
         text: data.reply || "Je n'ai pas bien compris, pouvez-vous reformuler ?",
         books: data.books || [],
+        params: data.params || {},
         action: data.action || null
       }]);
     } catch (err) {
@@ -116,7 +117,7 @@ export default function Chatbot() {
                 {msg.action === 'create-offer' && (
                   <div className="mt-3">
                     <button
-                      onClick={() => { window.location.href = '/create-offer'; setIsOpen(false); }}
+                      onClick={() => { window.location.hash = '#my-offers'; setIsOpen(false); }}
                       className="w-full py-2 bg-gradient-to-r from-[#2777df] to-[#fc4d16] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5"
                     >
                       <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
@@ -154,6 +155,19 @@ export default function Chatbot() {
                       </div>
                     </div>
                   ))}
+                  <button
+                    onClick={() => {
+                      const q = [msg.params?.subject, msg.params?.level, msg.params?.location].filter(Boolean).join(' ');
+                      window.location.hash = '#searchresults?q=' + encodeURIComponent(q);
+                      setIsOpen(false);
+                    }}
+                    className="mt-2 w-full py-2.5 bg-gradient-to-r from-[#2777df] to-[#3a8ef6] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5"
+                  >
+                    Voir les offres disponibles →
+                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
                 </div>
               )}
             </div>

@@ -34,24 +34,32 @@ exports.askChatbot = async (req, res) => {
     try {
       const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY;
       if (NVIDIA_API_KEY) {
-        const systemInstruction = `Tu es l'assistant de LinkBook, une plateforme de livres d'occasion en Tunisie.
+        const systemInstruction = `Tu es l'assistant LinkBook, specialiste des livres scolaires et series d'examens en Tunisie.
+
+VOCABULAIRE EXACT (utilise ces valeurs, jamais de variantes):
+Matières: Anglais, Arabe, Chimie, Français, Géographie, Histoire, Informatique, Mathématiques, Philosophie, Physique, SVT, Sciences, Technologie, Autre
+Niveaux: Primaire, Collège, Lycée, Bac, Supérieur, 3ème année, 2ème année, 1ère année, Secondaire — 1ère année, Secondaire — 4ème année (BAC), Autre
+Séries d'examens: Bac, 9ème, Brevet, Concours
+Localisations: Sfax, Nabeul, Bizerte, Ariana, Tunis, Monastir, La Manouba, Sousse, Gabès, Le Kef
 
 REGLES:
-1. Reponds toujours en francais.
-2. Analyse ce que tu sais et ce qu'il manque. Ne pose qu'UNE SEULE question a la fois.
-3. Declenche la recherche des que sujet + niveau sont connus.
-4. NE JAMAIS INVENTER de livres. Tu definis seulement les criteres de recherche.
-5. Si l'utilisateur veut VENDRE, PUBLIER, CREER, DONNER un livre → intent "action" avec actionType "create-offer".
+1. Reponds toujours en francais. Sois chaleureux et naturel comme un libraire tunisien.
+2. Analyse ce qu'il manque. Ne pose qu'UNE question a la fois (d'abord niveau, puis wilaya si necessaire).
+3. Des que sujet + niveau sont connus → intent "search". Meme si la wilaya manque, lance la recherche.
+4. NE JAMAIS INVENTER de livres. Tu fournis seulement les criteres de recherche.
+5. Si l'utilisateur veut VENDRE, PUBLIER, CREER, DONNER → intent "action", actionType "create-offer".
+6. Pour les series d'examens (Bac, 9eme, concours), mappe vers le niveau approprie.
+7. Inclus toujours la ou les wilaya(s) dans ta reponse si trouvee(s).
 
-Format de reponse STRICT (JSON uniquement):
+FORMAT DE REPONSE (JSON uniquement):
 {
   "intent": "search" | "ask_info" | "chat" | "action",
   "actionType": "create-offer" | null,
-  "reply": "Ta reponse en francais, naturelle et concise",
+  "reply": "Ta reponse naturelle en francais",
   "searchParams": {
-    "subject": null,
-    "level": null,
-    "location": null,
+    "subject": null | "Mathématiques" | "Physique" | ...,
+    "level": null | "3ème année" | "Bac" | ...,
+    "location": null | "Sfax" | "Tunis" | ...,
     "type": null,
     "priceMin": null,
     "priceMax": null,
@@ -61,15 +69,22 @@ Format de reponse STRICT (JSON uniquement):
   "missingFields": []
 }
 
-Exemples:
-"math 3eme" → intent: search, searchParams: { subject: "maths", level: "3eme" }
-"Je cherche maths 3eme" → intent: search, searchParams: { subject: "maths", level: "3eme" }
-"physique bac" → intent: search, searchParams: { subject: "physique", level: "bac" }
-"Je cherche un livre de maths" → intent: ask_info, reply: "Pour quel niveau ?", searchParams: { subject: "maths" }
-"je veux des maths" → intent: ask_info, reply: "Pour quel niveau ?", searchParams: { subject: "maths" }
-"3eme" → intent: ask_info, reply: "Pour quel sujet ?", searchParams: { level: "3eme" }
-"Bonjour" → intent: chat
-"Je veux vendre un livre" → intent: action, actionType: "create-offer"`;
+EXEMPLES (mappe vers les valeurs EXACTES ci-dessus):
+"math 3eme" → search, subject: "Mathématiques", level: "3ème année"
+"maths 3eme annee primaire" → search, subject: "Mathématiques", level: "3ème année"
+"physique bac" → search, subject: "Physique", level: "Bac"
+"francais 9eme" → search, subject: "Français", level: "Collège"
+"anglais 1ere annee secondaire" → search, subject: "Anglais", level: "Secondaire — 1ère année"
+"livre maths sfax" → search, subject: "Mathématiques", location: "Sfax"
+"Je cherche maths 3eme a sfax" → search, subject: "Mathématiques", level: "3ème année", location: "Sfax"
+"3eme" → ask_info, searchParams: { level: "3ème année" }, reply: "Quelle matiere cherchez-vous pour la 3eme annee ?"
+"Je veux un livre de maths" → ask_info, searchParams: { subject: "Mathématiques" }, reply: "Pour quel niveau ?"
+"je veux vendre un livre" → action, actionType: "create-offer"
+"Bonjour" → chat, reply: "Bonjour ! Je suis l'assistant LinkBook. Je vous aide a trouver des livres scolaires en Tunisie. Dites-moi ce que vous cherchez (matiere, niveau, ville)."
+"J'ai besoin du livre de maths pour la 3eme annee primaire a sfax" → search, subject: "Mathématiques", level: "3ème année", location: "Sfax"
+"serie bac maths" → search, subject: "Mathématiques", level: "Bac"
+"math bac" → search, subject: "Mathématiques", level: "Bac"
+"livre svt" → ask_info, searchParams: { subject: "SVT" }, reply: "Pour quel niveau voulez-vous un livre de SVT ?"`;
 
 
         const model = process.env.NVIDIA_MODEL || "meta/llama-3.1-8b-instruct";
@@ -126,12 +141,17 @@ Exemples:
       }
     } catch (e) {
       console.error("[CHATBOT] AI failed:", e.message);
-      parsed = {
-        intent: 'chat',
-        reply: "Désolé, mon assistant IA est momentanément indisponible. Réessayez plus tard.",
-        searchParams: {},
-        missingFields: []
-      };
+      const fallbackReply = extractFallbackParams(message);
+      if (fallbackReply) {
+        parsed = fallbackReply;
+      } else {
+        parsed = {
+          intent: 'chat',
+          reply: "Désolé, mon assistant IA est momentanément indisponible. Réessayez plus tard ou contactez-nous directement.",
+          searchParams: {},
+          missingFields: []
+        };
+      }
     }
 
     const mergedParams = { ...currentParams };
@@ -144,7 +164,27 @@ Exemples:
       }
     }
 
+    const normalizedParams = normalizeSearchParams(mergedParams);
+    Object.assign(mergedParams, normalizedParams);
+
     if (parsed.intent === 'search') {
+      const hasSearchCriteria = mergedParams.subject || mergedParams.level || mergedParams.keyword;
+      if (!hasSearchCriteria) {
+        const fb = extractFallbackParams(message);
+        if (fb && (fb.searchParams.subject || fb.searchParams.level)) {
+          Object.assign(mergedParams, fb.searchParams);
+          parsed.reply = fb.reply;
+          parsed.missingFields = fb.missingFields || [];
+        } else {
+          return res.json({
+            success: true,
+            reply: "Je peux vous aider a trouver des livres scolaires en Tunisie ! Dites-moi la matiere (Maths, Physique, Francais...) et le niveau qui vous interesse.",
+            books: [],
+            params: mergedParams
+          });
+        }
+      }
+
       const filter = buildBookFilter(mergedParams);
       let books = await Book.find(filter)
         .populate('user', 'name phone email wilaya location')
@@ -209,11 +249,80 @@ function buildPrompt(message, currentParams, history) {
   return prompt;
 }
 
+function normalizeSearchParams(params) {
+  const result = { ...params };
+
+  const subjectMap = {
+    'math': 'Mathématiques', 'maths': 'Mathématiques', 'mathematique': 'Mathématiques', 'mathematiques': 'Mathématiques',
+    'physique': 'Physique', 'phys': 'Physique',
+    'chimie': 'Chimie', 'ch': 'Chimie',
+    'francais': 'Français', 'français': 'Français', 'fr': 'Français',
+    'anglais': 'Anglais', 'angl': 'Anglais', 'en': 'Anglais',
+    'histoire': 'Histoire', 'hist': 'Histoire',
+    'geographie': 'Géographie', 'geo': 'Géographie', 'geog': 'Géographie',
+    'svt': 'SVT', 'science de la vie': 'SVT',
+    'sciences': 'Sciences', 'science': 'Sciences',
+    'technologie': 'Technologie', 'tech': 'Technologie',
+    'philosophie': 'Philosophie', 'philo': 'Philosophie',
+    'informatique': 'Informatique', 'info': 'Informatique', 'pc': 'Informatique',
+    'arabe': 'Arabe',
+  };
+
+  const levelMap = {
+    '3eme': '3ème année', '3eme annee': '3ème année', '3ème': '3ème année', '3ème année': '3ème année',
+    '2eme': '2ème année', '2eme annee': '2ème année', '2ème': '2ème année', '2ème année': '2ème année',
+    '1ere': '1ère année', '1ere annee': '1ère année', '1ère': '1ère année', '1ère année': '1ère année',
+    'primaire': 'Primaire', 'prim': 'Primaire',
+    'college': 'Collège', 'colleg': 'Collège',
+    'lycee': 'Lycée', 'lycée': 'Lycée', 'secondaire': 'Lycée',
+    'bac': 'Bac', 'baccalaureat': 'Bac', 'baccalauréat': 'Bac',
+    'bac info': 'Bac', 'bac maths': 'Bac',
+    'superieur': 'Supérieur', 'sup': 'Supérieur', 'universite': 'Supérieur', 'université': 'Supérieur',
+    '1ere annee secondaire': 'Secondaire — 1ère année', '1ère année secondaire': 'Secondaire — 1ère année',
+    '4eme annee': 'Secondaire — 4ème année (BAC)', '4ème année': 'Secondaire — 4ème année (BAC)',
+    '4eme': 'Secondaire — 4ème année (BAC)', '4ème': 'Secondaire — 4ème année (BAC)',
+    '9eme': 'Collège', '9ème': 'Collège',
+    'concours': 'Autre',
+  };
+
+  const locationMap = {
+    'sfax': 'Sfax', 'sfax ville': 'Sfax',
+    'tunis': 'Tunis', 'tunis ville': 'Tunis',
+    'nabeul': 'Nabeul',
+    'bizerte': 'Bizerte',
+    'ariana': 'Ariana',
+    'monastir': 'Monastir',
+    'sousse': 'Sousse',
+    'gabes': 'Gabès', 'gabès': 'Gabès',
+    'le kef': 'Le Kef', 'kef': 'Le Kef',
+    'la manouba': 'La Manouba', 'manouba': 'La Manouba',
+  };
+
+  if (result.subject) {
+    const key = result.subject.toLowerCase().trim();
+    if (subjectMap[key]) result.subject = subjectMap[key];
+  }
+  if (result.level) {
+    const key = result.level.toLowerCase().trim();
+    if (levelMap[key]) result.level = levelMap[key];
+  }
+  if (result.location) {
+    const key = result.location.toLowerCase().trim();
+    if (locationMap[key]) result.location = locationMap[key];
+  }
+
+  return result;
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function buildBookFilter(params) {
   const filter = { status: 'Disponible' };
-  if (params.subject) filter.subject = { $regex: params.subject, $options: 'i' };
-  if (params.level) filter.level = { $regex: params.level, $options: 'i' };
-  if (params.location) filter.location = { $regex: params.location, $options: 'i' };
+  if (params.subject) filter.subject = { $regex: `^${escapeRegex(params.subject)}$`, $options: 'i' };
+  if (params.level) filter.level = { $regex: `^${escapeRegex(params.level)}$`, $options: 'i' };
+  if (params.location) filter.location = { $regex: `^${escapeRegex(params.location)}$`, $options: 'i' };
   if (params.type) filter.type = params.type;
   if (params.condition) filter.condition = { $regex: params.condition, $options: 'i' };
   if (params.priceMin || params.priceMax) {
@@ -229,6 +338,124 @@ function buildBookFilter(params) {
     ];
   }
   return filter;
+}
+
+function extractFallbackParams(message) {
+  const msg = message.toLowerCase().trim();
+
+  const subjectPatterns = {
+    'Mathématiques': /math[eé]matiques?|maths?\b/,
+    'Physique': /physique/,
+    'Chimie': /chimie/,
+    'Français': /fran[cç]ais?\b/,
+    'Anglais': /anglais/,
+    'Histoire': /histoire/,
+    'Géographie': /g[ée]ographie/,
+    'SVT': /\bsvt\b/,
+    'Sciences': /sciences?\b/,
+    'Technologie': /technologie/,
+    'Philosophie': /philosophie/,
+    'Informatique': /informatique/,
+    'Arabe': /arabe/,
+  };
+
+  const levelPatterns = {
+    '3ème année': /3(?:eme|ème)\s*(?:ann[eé]e)?(?:\s*primaire)?/,
+    '2ème année': /2(?:eme|ème)\s*(?:ann[eé]e)?/,
+    '1ère année': /1(?:ere|ère)\s*(?:ann[eé]e)?/,
+    'Primaire': /primaire/,
+    'Collège': /college|collège|9(?:eme|ème)/,
+    'Lycée': /lycee|lycée|secondaire/,
+    'Bac': /\bbac(?:calaureat|calauréat)?\b/,
+    'Supérieur': /sup[ée]rieur|universit[ée]/,
+    'Secondaire — 1ère année': /1(?:ere|ère)\s*(?:ann[eé]e)?\s*secondaire/,
+    'Secondaire — 4ème année (BAC)': /4(?:eme|ème)\s*(?:ann[eé]e)?/,
+  };
+
+  const locationPatterns = {
+    'Sfax': /sfax/,
+    'Tunis': /tunis/,
+    'Nabeul': /nabeul/,
+    'Bizerte': /bizerte/,
+    'Ariana': /ariana/,
+    'Monastir': /monastir/,
+    'Sousse': /sousse/,
+    'Gabès': /gab[eè]s/,
+    'Le Kef': /kef/,
+    'La Manouba': /manouba/,
+  };
+
+  const wantsSell = /vendre|publier|cr[ée]er.*offre|donner/;
+  const wantsSearch = /cherche|besoin|livre|trouver|offre|avoir|veux|recommand/;
+
+  let subject = null, level = null, location = null;
+
+  for (const [val, pattern] of Object.entries(subjectPatterns)) {
+    if (pattern.test(msg)) { subject = val; break; }
+  }
+  for (const [val, pattern] of Object.entries(levelPatterns)) {
+    if (pattern.test(msg)) { level = val; break; }
+  }
+  for (const [val, pattern] of Object.entries(locationPatterns)) {
+    if (pattern.test(msg)) { location = val; break; }
+  }
+
+  if (wantsSell.test(msg)) {
+    return {
+      intent: 'action',
+      actionType: 'create-offer',
+      reply: "Je vois que vous souhaitez proposer un livre. Cliquez sur le bouton ci-dessous pour creer votre offre !",
+      searchParams: { subject, level, location },
+      missingFields: []
+    };
+  }
+
+  if (subject && level) {
+    return {
+      intent: 'search',
+      reply: `Je cherche des ${subject} pour ${level}${location ? ' a ' + location : ''}...`,
+      searchParams: { subject, level, location },
+      missingFields: []
+    };
+  }
+
+  if (subject) {
+    return {
+      intent: 'ask_info',
+      reply: "Pour quel niveau cherchez-vous ce livre ?",
+      searchParams: { subject, level: null, location },
+      missingFields: ['level']
+    };
+  }
+
+  if (level && location) {
+    return {
+      intent: 'ask_info',
+      reply: `Quelle matiere cherchez-vous pour le niveau ${level} a ${location} ?`,
+      searchParams: { subject: null, level, location },
+      missingFields: ['subject']
+    };
+  }
+
+  if (level) {
+    return {
+      intent: 'ask_info',
+      reply: `Quelle matiere cherchez-vous pour le niveau ${level} ?`,
+      searchParams: { subject: null, level, location },
+      missingFields: ['subject']
+    };
+  }
+
+  if (wantsSearch.test(msg)) {
+    return {
+      intent: 'ask_info',
+      reply: "Je peux vous aider a trouver des livres scolaires en Tunisie ! Dites-moi la matiere (Maths, Physique, Francais...) et le niveau qui vous interesse.",
+      searchParams: {},
+      missingFields: ['subject', 'level']
+    };
+  }
+
+  return null;
 }
 
 exports.getConversations = async (req, res, next) => {

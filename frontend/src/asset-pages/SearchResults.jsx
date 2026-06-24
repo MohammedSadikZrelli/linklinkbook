@@ -8,7 +8,7 @@ const typeLabel = (t) => t === 'vente' ? 'Vente' : t === 'échange' ? 'Échange'
 export default function SearchResults({ query }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState(query?.q || '');
   const [activeType, setActiveType] = useState(query?.type || '');
   const [activeWilaya, setActiveWilaya] = useState(query?.wilaya || '');
   const [cart, setCart] = useState(cartAPI.get());
