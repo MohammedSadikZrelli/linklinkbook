@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const { sendInvitation, getMyInvitations, acceptInvitation, refuseInvitation } = require('../controllers/invitationController');
 const protect = require('../middleware/auth');
+const { validate } = require('../validators');
+const { sendInvitationSchema } = require('../validators/invitation');
 
 router.route('/')
-  .post(protect, sendInvitation)
+  .post(protect, validate(sendInvitationSchema), sendInvitation)
   .get(protect, getMyInvitations);
 
 router.put('/:id/accept', protect, acceptInvitation);
