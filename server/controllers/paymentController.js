@@ -1,13 +1,15 @@
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
 const Book = require('../models/Book');
+const { sanitize } = require('../utils/sanitize');
 
 // @desc    Request a balance recharge (User uploads proof)
 // @route   POST /api/payments/recharge
 // @access  Private
 exports.requestRecharge = async (req, res, next) => {
   try {
-    const { amount, proofImage, method } = req.body;
+    let { amount, proofImage, method } = req.body;
+    if (method) method = sanitize(method);
     if (!amount || !proofImage) {
       return res.status(400).json({ success: false, message: 'Montant et preuve requis' });
     }
@@ -60,6 +62,9 @@ exports.purchaseBook = async (req, res, next) => {
     
     if (!book) return res.status(404).json({ success: false, message: 'Livre non trouvé' });
     if (book.status !== 'Disponible') return res.status(400).json({ success: false, message: 'Livre non disponible' });
+    if (book.user._id.toString() === req.user._id.toString()) {
+      return res.status(400).json({ success: false, message: 'Vous ne pouvez pas acheter votre propre livre' });
+    }
     
     const buyer = await User.findById(req.user._id);
     const seller = await User.findById(book.user._id);

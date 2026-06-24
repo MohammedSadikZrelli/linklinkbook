@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const sendEmail = require('../utils/sendEmail');
+const { sanitize, sanitizeFields } = require('../utils/sanitize');
 
 const buildAddress = (address = {}) => ({
   street: address.street || address.addressLine || '',
@@ -33,7 +34,8 @@ const userResponse = (user) => ({
  */
 const registerUser = async (req, res) => {
   try {
-    const { name, email, phone, password, profileType, schoolLevel, wilaya, address } = req.body;
+    let { name, email, phone, password, profileType, schoolLevel, wilaya, address } = req.body;
+    sanitizeFields(req.body, ['name', 'email', 'phone', 'schoolLevel', 'wilaya']);
 
     if (!name || !email || !phone || !password || !profileType || !wilaya || !address?.street) {
       return res.status(400).json({ 
@@ -336,7 +338,8 @@ const resetPassword = async (req, res) => {
  */
 const updateProfile = async (req, res, next) => {
   try {
-    const { name, phone, profileType, schoolLevel, wilaya, address, avatar } = req.body;
+    let { name, phone, profileType, schoolLevel, wilaya, address, avatar } = req.body;
+    sanitizeFields(req.body, ['name', 'phone', 'schoolLevel', 'wilaya']);
     const user = await User.findById(req.user._id);
 
     if (name !== undefined) user.name = name;
@@ -366,7 +369,7 @@ const updateProfile = async (req, res, next) => {
  */
 const changePassword = async (req, res, next) => {
   try {
-    const { currentPassword, newPassword } = req.body;
+    let { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
       return res.status(400).json({ success: false, message: 'Veuillez fournir l\'ancien et le nouveau mot de passe' });

@@ -34,13 +34,14 @@ const getUsers = async (req, res, next) => {
     const query = {};
 
     if (search) {
+      const s = String(search);
       query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { phone: { $regex: search, $options: 'i' } },
-        { profileType: { $regex: search, $options: 'i' } },
-        { 'address.street': { $regex: search, $options: 'i' } },
-        { 'address.city': { $regex: search, $options: 'i' } }
+        { name: { $regex: s, $options: 'i' } },
+        { email: { $regex: s, $options: 'i' } },
+        { phone: { $regex: s, $options: 'i' } },
+        { profileType: { $regex: s, $options: 'i' } },
+        { 'address.street': { $regex: s, $options: 'i' } },
+        { 'address.city': { $regex: s, $options: 'i' } }
       ];
     }
     if (role) query.role = role;
@@ -335,9 +336,10 @@ const getBooks = async (req, res, next) => {
     if (status) query.status = status;
     if (type) query.type = type;
     if (search) {
+      const s = String(search);
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { subject: { $regex: search, $options: 'i' } }
+        { title: { $regex: s, $options: 'i' } },
+        { subject: { $regex: s, $options: 'i' } }
       ];
     }
 

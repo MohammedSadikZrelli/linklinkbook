@@ -1,12 +1,14 @@
 const Book = require('../models/Book');
 const mongoose = require('mongoose');
+const { sanitize, sanitizeFields } = require('../utils/sanitize');
 
 // @desc    Create a new book
 // @route   POST /api/books
 // @access  Private
 const createBook = async (req, res, next) => {
   try {
-    const { title, subject, level, condition, price, type, status, images, description, location, author, isbn } = req.body;
+    let { title, subject, level, condition, price, type, status, images, description, location, author, isbn } = req.body;
+    sanitizeFields(req.body, ['title', 'subject', 'level', 'condition', 'description', 'location', 'author', 'isbn']);
 
     const isSubscribed = req.user.subscriptionActive;
 
@@ -71,8 +73,8 @@ const getBooks = async (req, res, next) => {
     }
 
     // Public filters
-    if (req.query.type) query.type = req.query.type;
-    if (req.query.subject) query.subject = { $regex: req.query.subject, $options: 'i' };
+    if (req.query.type) query.type = String(req.query.type);
+    if (req.query.subject) query.subject = { $regex: String(req.query.subject), $options: 'i' };
 
     const limit = parseInt(req.query.limit) || 50;
     const page = parseInt(req.query.page) || 1;
@@ -107,16 +109,17 @@ const searchBooks = async (req, res, next) => {
     const query = { status: 'Disponible' };
 
     if (q) {
+      const sq = String(q);
       query.$or = [
-        { title: { $regex: q, $options: 'i' } },
-        { subject: { $regex: q, $options: 'i' } },
-        { level: { $regex: q, $options: 'i' } },
+        { title: { $regex: sq, $options: 'i' } },
+        { subject: { $regex: sq, $options: 'i' } },
+        { level: { $regex: sq, $options: 'i' } },
       ];
     }
-    if (subject) query.subject = { $regex: subject, $options: 'i' };
-    if (wilaya) query.wilaya = { $regex: wilaya, $options: 'i' };
-    if (type) query.type = type;
-    if (level) query.level = { $regex: level, $options: 'i' };
+    if (subject) query.subject = { $regex: String(subject), $options: 'i' };
+    if (wilaya) query.wilaya = { $regex: String(wilaya), $options: 'i' };
+    if (type) query.type = String(type);
+    if (level) query.level = { $regex: String(level), $options: 'i' };
 
     const limit = parseInt(req.query.limit) || 50;
     const page = parseInt(req.query.page) || 1;
@@ -174,6 +177,7 @@ const updateBook = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Not authorized to update this book' });
     }
 
+    sanitizeFields(req.body, ['title', 'subject', 'level', 'condition', 'description', 'location', 'author', 'isbn']);
     const allowed = ['title', 'subject', 'level', 'condition', 'price', 'type', 'status', 'description', 'location', 'images', 'author', 'isbn'];
     const updates = {};
     allowed.forEach(f => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });

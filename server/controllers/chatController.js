@@ -2,6 +2,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const Book = require('../models/Book');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
+const { sanitize } = require('../utils/sanitize');
 
 // --- AI Chatbot Section ---
 
@@ -160,7 +161,8 @@ exports.getMessages = async (req, res, next) => {
 // @access  Private
 exports.sendMessage = async (req, res, next) => {
   try {
-    const { conversationId, text, attachments } = req.body;
+    let { conversationId, text, attachments } = req.body;
+    if (text) text = sanitize(text);
 
     const conversation = await Conversation.findById(conversationId);
     if (!conversation) return res.status(404).json({ success: false, message: "Discussion non trouvée" });

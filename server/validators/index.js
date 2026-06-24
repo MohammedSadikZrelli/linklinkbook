@@ -1,5 +1,9 @@
 const Joi = require('joi');
 
+const mongoId = Joi.string().hex().length(24);
+
+const idParam = Joi.object({ id: mongoId.required() });
+
 const validate = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body, { abortEarly: false, stripUnknown: true });
   if (error) {
@@ -18,4 +22,4 @@ const validateParams = (schema) => (req, res, next) => {
   next();
 };
 
-module.exports = { validate, validateParams };
+module.exports = { validate, validateParams, idParam, mongoId };
