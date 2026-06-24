@@ -54,10 +54,12 @@ REGLES:
 4. Declenche la recherche des que sujet + niveau sont connus (n'attends pas tout).
 5. NE JAMAIS INVENTER de livres. Tu definis seulement les criteres de recherche (searchParams). Les vrais resultats viennent de la base de donnees.
 6. Si l'utilisateur semble perdu, donne des exemples: "Par exemple: maths, francais, anglais, svt..."
+7. IMPORTANT: Si l'utilisateur veut VENDRE, PUBLIER, CREER une offre, DONNER un livre, ou toute action (pas une recherche), utilise intent "action" avec actionType et redirige-le.
 
 Format de reponse STRICT (JSON uniquement):
 {
-  "intent": "search" | "ask_info" | "chat",
+  "intent": "search" | "ask_info" | "chat" | "action",
+  "actionType": "create-offer" | null,
   "reply": "Ta reponse en francais, naturelle et concise",
   "searchParams": {
     "subject": null,
@@ -75,6 +77,7 @@ Format de reponse STRICT (JSON uniquement):
 - "search": suffisamment d'infos (sujet + niveau minimum). Lance la recherche.
 - "ask_info": il manque des infos. Demande UN SEUL champ.
 - "chat": salutation, remerciement, hors-sujet.
+- "action": utilisateur veut faire une action (vendre, creer, publier). Mets actionType="create-offer".
 
 Exemples:
 Utilisateur: "Je cherche un livre de maths"
@@ -88,6 +91,9 @@ Utilisateur: "Sfax" (contexte: sujet=maths, niveau=3eme)
 
 Utilisateur: "Bonjour" / "Salem" / "Hi" / "Nihao"
 → { "intent": "chat", "reply": "Bonjour ! Je suis l'assistant LinkBook. Je peux vous aider a trouver des livres. Que cherchez-vous ?", "searchParams": {} }
+
+Utilisateur: "Je veux vendre un livre" / "Je veux creer une offre" / "Publier un livre"
+→ { "intent": "action", "actionType": "create-offer", "reply": "Pour creer une offre, rendez-vous sur la page Creer une offre. Je peux vous aider a decrire votre livre si vous voulez !", "searchParams": {} }
 
 IMPORTANT: Ne reponds JAMAIS avec des informations inventees. Si tu ne sais pas, dis-le.`;
 
@@ -136,6 +142,14 @@ IMPORTANT: Ne reponds JAMAIS avec des informations inventees. Si tu ne sais pas,
       }
 
       return res.json({ success: true, reply, books, params: mergedParams });
+    } else if (parsed.intent === 'action') {
+      return res.json({
+        success: true,
+        reply: parsed.reply || "Bien sûr ! Rendez-vous sur la page de création d'offre.",
+        books: [],
+        params: mergedParams,
+        action: parsed.actionType || 'create-offer'
+      });
     } else if (parsed.intent === 'ask_info') {
       return res.json({
         success: true,
@@ -275,11 +289,18 @@ function fallbackParse(message, currentParams) {
   const hasSearchIntent = searchWords.some(w => text.includes(w));
   const greetings = ['bonjour', 'salem', 'hi', 'hello', 'nihao', 'salam', 'hey', 'bonsoir', 'salut'];
   const isGreeting = greetings.some(w => text.includes(w)) && text.split(' ').length <= 3;
+  const actionWords = ['vendre', 'créer', 'creer', 'publier', 'poster', 'ajouter', 'mettre en vente', 'donner mon livre', 'offrir'];
+  const wantsAction = actionWords.some(w => text.includes(w));
 
   let intent = 'chat';
   let reply = "Bonjour ! Je peux vous aider à trouver un livre. Que cherchez-vous ?";
+  let actionType = null;
 
-  if (isGreeting) {
+  if (wantsAction) {
+    intent = 'action';
+    actionType = 'create-offer';
+    reply = "Pour créer une offre, rendez-vous sur la page Créer une offre. Je peux vous aider à décrire votre livre si vous voulez !";
+  } else if (isGreeting) {
     // stays as chat
   } else if (hasSearchIntent || params.subject || params.level) {
     intent = params.subject && params.level ? 'search' : 'ask_info';
@@ -294,7 +315,7 @@ function fallbackParse(message, currentParams) {
     }
   }
 
-  return { intent, reply, searchParams: params, missingFields: [] };
+  return { intent, reply, searchParams: params, missingFields: [], actionType };
 }
 
 exports.getConversations = async (req, res, next) => {

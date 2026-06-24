@@ -61,7 +61,8 @@ export default function Chatbot() {
       setMessages(prev => [...prev, {
         sender: 'bot',
         text: data.reply || "Désolé, je n'ai pas pu traiter votre demande.",
-        books: data.books || []
+        books: data.books || [],
+        action: data.action || null
       }]);
     } catch (err) {
       setMessages(prev => [...prev, { sender: 'bot', text: "Erreur de connexion avec le serveur." }]);
@@ -135,6 +136,17 @@ export default function Chatbot() {
               <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
             </div>
 
+            {msg.action && (
+              <div className="mt-2 w-[88%]">
+                <button
+                  onClick={() => { window.location.hash = '#create-offer'; setIsOpen(false); }}
+                  className="w-full py-2.5 bg-gradient-to-r from-[#2777df] to-[#fc4d16] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                  Créer une offre
+                </button>
+              </div>
+            )}
             {msg.books && msg.books.length > 0 && (
               <div className="mt-2 space-y-2 w-[88%]">
                 {msg.books.map(book => (
