@@ -37,13 +37,11 @@ exports.askChatbot = async (req, res) => {
         const systemInstruction = `Tu es l'assistant de LinkBook, une plateforme de livres d'occasion en Tunisie.
 
 REGLES:
-1. Reponds toujours en francais, meme si l'utilisateur te salue dans une autre langue (salem, hi, hello, nihao, etc).
-2. POUR CHAQUE MESSAGE, analyse ce que tu sais et ce qu'il manque. Reflechis etape par etape.
-3. Ne pose qu'UNE SEULE question a la fois. La priorite: sujet > niveau > type (vente/echange/don) > ville > prix > etat.
-4. Declenche la recherche des que sujet + niveau sont connus (n'attends pas tout).
-5. NE JAMAIS INVENTER de livres. Tu definis seulement les criteres de recherche (searchParams). Les vrais resultats viennent de la base de donnees.
-6. Si l'utilisateur semble perdu, donne des exemples: "Par exemple: maths, francais, anglais, svt..."
-7. IMPORTANT: Si l'utilisateur veut VENDRE, PUBLIER, CREER une offre, DONNER un livre, ou toute action (pas une recherche), utilise intent "action" avec actionType et redirige-le.
+1. Reponds toujours en francais.
+2. Analyse ce que tu sais et ce qu'il manque. Ne pose qu'UNE SEULE question a la fois.
+3. Declenche la recherche des que sujet + niveau sont connus.
+4. NE JAMAIS INVENTER de livres. Tu definis seulement les criteres de recherche.
+5. Si l'utilisateur veut VENDRE, PUBLIER, CREER, DONNER un livre → intent "action" avec actionType "create-offer".
 
 Format de reponse STRICT (JSON uniquement):
 {
@@ -63,31 +61,17 @@ Format de reponse STRICT (JSON uniquement):
   "missingFields": []
 }
 
-- "search": suffisamment d'infos (sujet + niveau minimum). Lance la recherche.
-- "ask_info": il manque des infos. Demande UN SEUL champ.
-- "chat": salutation, remerciement, hors-sujet.
-- "action": utilisateur veut faire une action (vendre, creer, publier). Mets actionType="create-offer".
-
 Exemples:
-Utilisateur: "Je cherche un livre de maths"
-→ { "intent": "ask_info", "reply": "Pour quel niveau ? (ex: 3eme, Bac, College)", "searchParams": { "subject": "Mathematiques", ... } }
+"Je cherche un livre de maths" → intent: ask_info, reply: "Pour quel niveau ?"
+"Je cherche maths 3eme" → intent: search, reply: "Je cherche des livres de maths pour la 3eme..."
+"Bonjour" → intent: chat, reply: "Bonjour ! Je suis l'assistant LinkBook..."
+"Je veux vendre un livre" → intent: action, actionType: "create-offer", reply: "Pour creer une offre..."
+"Sfax" (contexte: sujet=maths, niveau=3eme) → intent: search`;
 
-Utilisateur: "Je cherche maths 3eme"
-→ { "intent": "search", "reply": "Je cherche des livres de maths pour la 3eme...", "searchParams": { "subject": "Mathematiques", "level": "3eme annee" } }
 
-Utilisateur: "Sfax" (contexte: sujet=maths, niveau=3eme)
-→ { "intent": "search", "reply": "Je cherche des livres de maths 3eme a Sfax...", "searchParams": { "location": "Sfax" } }
-
-Utilisateur: "Bonjour" / "Salem" / "Hi" / "Nihao"
-→ { "intent": "chat", "reply": "Bonjour ! Je suis l'assistant LinkBook. Je peux vous aider a trouver des livres. Que cherchez-vous ?", "searchParams": {} }
-
-Utilisateur: "Je veux vendre un livre" / "Je veux creer une offre" / "Publier un livre"
-→ { "intent": "action", "actionType": "create-offer", "reply": "Pour creer une offre, rendez-vous sur la page Creer une offre. Je peux vous aider a decrire votre livre si vous voulez !", "searchParams": {} }
-
-IMPORTANT: Ne reponds JAMAIS avec des informations inventees. Si tu ne sais pas, dis-le.`;
+        const model = process.env.NVIDIA_MODEL || "meta/llama-3.2-3b-instruct";
 
         const prompt = buildPrompt(message, currentParams, history);
-        const model = process.env.NVIDIA_MODEL || "meta/llama-3.2-3b-instruct";
 
         const messages = [
           { role: "user", content: systemInstruction + "\n\n" + prompt }
@@ -98,7 +82,7 @@ IMPORTANT: Ne reponds JAMAIS avec des informations inventees. Si tu ne sais pas,
           {
             model,
             messages,
-            max_tokens: 16384,
+            max_tokens: 2048,
             temperature: 0.60,
             top_p: 0.95,
             stream: false
@@ -107,17 +91,16 @@ IMPORTANT: Ne reponds JAMAIS avec des informations inventees. Si tu ne sais pas,
             headers: {
               "Authorization": `Bearer ${NVIDIA_API_KEY}`,
               "Accept": "application/json"
-            }
+            },
+            timeout: 60000
           }
         );
 
         let content = response.data.choices[0].message.content;
 
-        // Strip markdown code blocks
         const codeBlock = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
         if (codeBlock) content = codeBlock[1];
 
-        // Find the first complete JSON object (handles trailing text)
         const start = content.indexOf('{');
         if (start === -1) throw new Error("No JSON object in response");
 
@@ -139,8 +122,13 @@ IMPORTANT: Ne reponds JAMAIS avec des informations inventees. Si tu ne sais pas,
         throw new Error("NVIDIA_API_KEY not set");
       }
     } catch (e) {
-      console.warn("AI unavailable, using fallback.", e.message);
-      parsed = fallbackParse(message, currentParams);
+      console.error("[CHATBOT] AI failed:", e.message);
+      parsed = {
+        intent: 'chat',
+        reply: "Désolé, mon assistant IA est momentanément indisponible. Réessayez plus tard.",
+        searchParams: {},
+        missingFields: []
+      };
     }
 
     const mergedParams = { ...currentParams };
@@ -238,113 +226,6 @@ function buildBookFilter(params) {
     ];
   }
   return filter;
-}
-
-function fallbackParse(message, currentParams) {
-  const text = message.toLowerCase();
-  const params = { ...currentParams };
-
-  const subjectMap = {
-    'math': 'Mathématiques', 'maths': 'Mathématiques',
-    'physique': 'Physique', 'phys': 'Physique',
-    'français': 'Français', 'francais': 'Français',
-    'anglais': 'Anglais', 'english': 'Anglais',
-    'sciences': 'Sciences', 'science': 'Sciences',
-    'histoire': 'Histoire', 'géo': 'Géographie', 'geographie': 'Géographie',
-    'arabe': 'Arabe',
-    'philosophie': 'Philosophie', 'philo': 'Philosophie',
-    'espagnol': 'Espagnol',
-    'allemand': 'Allemand',
-    'svt': 'SVT', 'biologie': 'SVT',
-    'chimie': 'Chimie',
-    'technologie': 'Technologie',
-    'informatique': 'Informatique',
-    'musique': 'Musique',
-  };
-
-  for (const [key, val] of Object.entries(subjectMap)) {
-    if (text.includes(key)) {
-      params.subject = val;
-      break;
-    }
-  }
-
-  const levelPatterns = [
-    { regex: /\b(1ère|1ere|première)\b/, value: '1ère année' },
-    { regex: /\b(2ème|2eme|deuxième)\b/, value: '2ème année' },
-    { regex: /\b(3ème|3eme|troisième)\b/, value: '3ème année' },
-    { regex: /\b(4ème|4eme|quatrième)\b/, value: '4ème année' },
-    { regex: /\b(5ème|5eme|cinquième)\b/, value: '5ème année' },
-    { regex: /\b(6ème|6eme|sixième)\b/, value: '6ème année' },
-    { regex: /\b(bac)\b/, value: 'Bac' },
-    { regex: /\b(primaire)\b/, value: 'Primaire' },
-    { regex: /\b(collège|college|moyen)\b/, value: 'Collège' },
-    { regex: /\b(lycée|lycee|secondaire)\b/, value: 'Lycée' },
-    { regex: /\b(université|universite|fac|supérieur)\b/, value: 'Supérieur' },
-  ];
-
-  for (const { regex, value } of levelPatterns) {
-    if (regex.test(text)) {
-      params.level = value;
-      break;
-    }
-  }
-
-  if (text.includes('achète') || text.includes('acheter') || text.includes('vente') || text.includes('achat') || text.includes('payer') || text.includes('prix')) {
-    params.type = 'vente';
-  } else if (text.includes('échange') || text.includes('echange') || text.includes('troquer')) {
-    params.type = 'échange';
-  } else if (text.includes('don') || text.includes('gratuit') || text.includes('gratis')) {
-    params.type = 'don';
-  }
-
-  const cities = ['tunis', 'sfax', 'sousse', 'nabeul', 'bizerte', 'béja', 'beja', 'jendouba',
-    'kairouan', 'kasserine', 'kébili', 'kebili', 'gabès', 'gabes', 'gafsa', 'médenine', 'medenine',
-    'monastir', 'mahdia', 'siliana', 'tataouine', 'tozeur', 'zaghouan', 'ben arous',
-    'ariana', 'manouba'];
-  for (const city of cities) {
-    if (text.includes(city)) {
-      params.location = city.charAt(0).toUpperCase() + city.slice(1);
-      break;
-    }
-  }
-
-  const priceMatch = text.match(/(\d+)\s*(dt|dinars?|euros?|€)/i);
-  if (priceMatch) {
-    params.priceMax = parseInt(priceMatch[1]);
-  }
-
-  const searchWords = ['cherche', 'besoin', 'livre', 'manuel', 'série', 'cours', 'exercice', 'bouquin'];
-  const hasSearchIntent = searchWords.some(w => text.includes(w));
-  const greetings = ['bonjour', 'salem', 'hi', 'hello', 'nihao', 'salam', 'hey', 'bonsoir', 'salut'];
-  const isGreeting = greetings.some(w => text.includes(w)) && text.split(' ').length <= 3;
-  const actionWords = ['vendre', 'créer', 'creer', 'publier', 'poster', 'ajouter', 'mettre en vente', 'donner mon livre', 'offrir'];
-  const wantsAction = actionWords.some(w => text.includes(w));
-
-  let intent = 'chat';
-  let reply = "Bonjour ! Je peux vous aider à trouver un livre. Que cherchez-vous ?";
-  let actionType = null;
-
-  if (wantsAction) {
-    intent = 'action';
-    actionType = 'create-offer';
-    reply = "Pour créer une offre, rendez-vous sur la page Créer une offre. Je peux vous aider à décrire votre livre si vous voulez !";
-  } else if (isGreeting) {
-    // stays as chat
-  } else if (hasSearchIntent || params.subject || params.level) {
-    intent = params.subject && params.level ? 'search' : 'ask_info';
-    if (intent === 'ask_info') {
-      if (!params.subject) reply = "Quel sujet cherchez-vous ? (maths, français, anglais, etc.)";
-      else if (!params.level) reply = `Pour quel niveau ? (ex: 3ème, Bac, Collège)`;
-      else if (!params.type) reply = "Vous préférez acheter, échanger ou un don ?";
-      else if (!params.location) reply = "Dans quelle région ?";
-      else reply = "Quel est votre budget maximum ?";
-    } else {
-      reply = `Je cherche des livres${params.subject ? ' de ' + params.subject : ''}${params.level ? ' pour ' + params.level : ''}...`;
-    }
-  }
-
-  return { intent, reply, searchParams: params, missingFields: [], actionType };
 }
 
 exports.getConversations = async (req, res, next) => {
