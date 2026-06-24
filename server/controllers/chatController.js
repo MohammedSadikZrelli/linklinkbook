@@ -1,21 +1,9 @@
+const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const Book = require('../models/Book');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
 const { sanitize } = require('../utils/sanitize');
-
-let puter = null;
-try {
-  const { init } = require("@heyputer/puter.js/src/init.cjs");
-  const token = process.env.PUTER_AUTH_TOKEN;
-  if (token) {
-    puter = init(token);
-  } else {
-    console.warn('⚠ PUTER_AUTH_TOKEN not set — AI chatbot will use fallback mode');
-  }
-} catch (e) {
-  console.warn('⚠ Failed to init Puter.js — AI chatbot will use fallback mode', e.message);
-}
 
 exports.askChatbot = async (req, res) => {
   try {
@@ -44,7 +32,8 @@ exports.askChatbot = async (req, res) => {
     let parsed = null;
 
     try {
-      if (puter) {
+      const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY;
+      if (NVIDIA_API_KEY) {
         const systemInstruction = `Tu es l'assistant de LinkBook, une plateforme de livres d'occasion en Tunisie.
 
 REGLES:
@@ -98,19 +87,40 @@ Utilisateur: "Je veux vendre un livre" / "Je veux creer une offre" / "Publier un
 IMPORTANT: Ne reponds JAMAIS avec des informations inventees. Si tu ne sais pas, dis-le.`;
 
         const prompt = buildPrompt(message, currentParams, history);
-        const model = "claude-sonnet-4";
+        const model = process.env.NVIDIA_MODEL || "qwen/qwen3.5-122b-a10b";
 
-        const response = await puter.ai.chat(prompt, {
-          model,
-          systemPrompt: systemInstruction,
-        });
+        const messages = [
+          { role: "user", content: systemInstruction + "\n\n" + prompt }
+        ];
 
-        parsed = JSON.parse(response);
+        const response = await axios.post(
+          "https://integrate.api.nvidia.com/v1/chat/completions",
+          {
+            model,
+            messages,
+            max_tokens: 16384,
+            temperature: 0.60,
+            top_p: 0.95,
+            stream: false
+          },
+          {
+            headers: {
+              "Authorization": `Bearer ${NVIDIA_API_KEY}`,
+              "Accept": "application/json"
+            }
+          }
+        );
+
+        let content = response.data.choices[0].message.content;
+        const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) content = jsonMatch[1];
+
+        parsed = JSON.parse(content);
       } else {
-        throw new Error("Puter not initialized");
+        throw new Error("NVIDIA_API_KEY not set");
       }
     } catch (e) {
-      console.warn("Puter unavailable, using fallback.", e.message);
+      console.warn("AI unavailable, using fallback.", e.message);
       parsed = fallbackParse(message, currentParams);
     }
 
