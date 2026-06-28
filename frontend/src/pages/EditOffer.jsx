@@ -32,6 +32,7 @@ const WILAYAS = ['Ariana', 'Béja', 'Ben Arous', 'Bizerte', 'Gabès', 'Gafsa', '
 export default function EditOffer({ query }) {
   const [form, setForm] = useState({ title: '', author: '', isbn: '', subject: '', level: '', condition: '', type: 'vente', price: '', description: '', location: '' });
   const [images, setImages] = useState([]);
+  const [previews, setPreviews] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [coverOptions, setCoverOptions] = useState(null);
   const [selectedCover, setSelectedCover] = useState('');
@@ -304,14 +305,25 @@ export default function EditOffer({ query }) {
               <label className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-200 hover:border-[#2777df] rounded-2xl cursor-pointer transition-colors bg-gray-50 hover:bg-[#2777df]/5 text-xs font-bold text-gray-400">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                 Ajouter
-                <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => setImages([...images, ...Array.from(e.target.files)])} />
+                <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => {
+  const newFiles = Array.from(e.target.files);
+  setImages(prev => [...prev, ...newFiles]);
+  newFiles.forEach(f => {
+    const reader = new FileReader();
+    reader.onload = (ev) => setPreviews(prev => [...prev, ev.target.result]);
+    reader.readAsDataURL(f);
+  });
+}} />
               </label>
               {images.length > 0 && (
                 <div className="flex gap-2 mt-2">
                   {images.map((f, i) => (
                     <div key={i} className="h-16 w-16 rounded-xl bg-gray-100 overflow-hidden relative group">
-                      <img src={URL.createObjectURL(f)} alt="" className="h-full w-full object-cover" />
-                      <button type="button" onClick={() => setImages(images.filter((_, j) => j !== i))}
+                      <img src={previews[i]} alt="" className="h-full w-full object-cover" />
+                      <button type="button" onClick={() => {
+                        setImages(prev => prev.filter((_, j) => j !== i));
+                        setPreviews(prev => prev.filter((_, j) => j !== i));
+                      }}
                         className="absolute top-0.5 right-0.5 h-4 w-4 bg-red-500 text-white rounded-full text-[10px] flex items-center justify-center">×</button>
                     </div>
                   ))}

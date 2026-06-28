@@ -3,14 +3,12 @@ import { notificationAPI, invitationAPI } from '../services/api';
 
 // ─── Top Navbar ──────────────────────────────────────────────────
 const NAV_MAP = [
-
-  // { label: 'Shop', hash: '#timeline' },
-  // { label: 'Carte', hash: '#map' },
-  // { label: 'Communauté', hash: '#community' },
-  // { label: 'Pack promo', hash: '#pricing' },
+  { label: 'Shop', hash: '#timeline' },
+  { label: 'Communauté', hash: '#community' },
+  { label: 'Pack Promo', hash: '#pricing' },
 ];
 
-export function Navbar({ transparent = false }) {
+export function Navbar({ transparent = false, sidebarLayout = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -89,13 +87,12 @@ export function Navbar({ transparent = false }) {
     : 'SB';
 
   return (
-    <header className={`w-full z-50 ${transparent ? 'absolute top-0 left-0 right-0 bg-transparent' : 'bg-white border-b border-gray-100 shadow-sm'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className={`w-full z-50 ${transparent ? 'absolute top-0 left-0 right-0 bg-transparent' : 'bg-white shadow-sm'}`}>
+      <div className={`${sidebarLayout ? 'w-full' : 'max-w-7xl mx-auto'} px-4 sm:px-6 lg:px-8`}>
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2 flex-shrink-0 cursor-pointer" onClick={() => window.location.hash = '#'}>
-            <img src="http://localhost:5000/api/assets/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-8 w-auto object-contain" alt="Linkbook" />
-            <span className={`font-black text-xl tracking-tight ${transparent ? 'text-white' : 'text-[#2777df]'}`}>Linkbook</span>
+          <div className={`${sidebarLayout ? 'w-48' : ''} flex items-center flex-shrink-0 cursor-pointer`} onClick={() => window.location.hash = '#'}>
+            <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-16 w-auto object-contain" alt="Linkbook" />
           </div>
 
           {/* Center Search — Type + Wilaya */}
@@ -145,6 +142,18 @@ export function Navbar({ transparent = false }) {
             </div>
           )}
 
+          {/* Nav Links — visible on desktop */}
+          {!sidebarLayout && (
+            <div className="hidden md:flex items-center gap-1">
+              {NAV_MAP.map(item => (
+                <a key={item.label} href={item.hash}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-colors ${transparent ? 'text-white/80 hover:bg-white/10' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}`}>
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          )}
+
           {/* Right Actions */}
           <div className="flex items-center gap-1 relative">
             {isAuthenticated ? (
@@ -157,11 +166,11 @@ export function Navbar({ transparent = false }) {
 
                 {/* Notification */}
                 <div className="relative notif-wrapper">
-                  <button onClick={() => setNotifOpen(!notifOpen)} className={`relative p-2 rounded-xl transition-colors ${transparent ? 'text-white/80 hover:bg-white/10' : 'text-gray-500 hover:bg-gray-100'}`}>
+                  <button onClick={(e) => { e.stopPropagation(); setProfileDropdownOpen(false); setNotifOpen(!notifOpen); }} className={`relative p-2 rounded-xl transition-colors ${transparent ? 'text-white/80 hover:bg-white/10' : 'text-gray-500 hover:bg-gray-100'}`}>
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                   </button>
                   {notifOpen && (
-                    <div className="absolute right-0 sm:right-auto mt-2 w-80 max-w-[90vw] rounded-2xl bg-white border border-gray-100 shadow-xl z-50 max-h-96 overflow-y-auto">
+                    <div className="absolute right-0 left-auto mt-2 w-80 max-w-[90vw] rounded-2xl bg-white border border-gray-100 shadow-xl z-50 max-h-96 overflow-y-auto">
                       <div className="px-4 py-3 border-b border-gray-50">
                         <p className="text-xs font-black text-gray-900">Notifications</p>
                       </div>
@@ -208,7 +217,7 @@ export function Navbar({ transparent = false }) {
                 {/* Avatar with dropdown */}
                 <div className="relative">
                   <button 
-                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    onClick={() => { setNotifOpen(false); setProfileDropdownOpen(!profileDropdownOpen); }}
                     className="h-8 w-8 rounded-full bg-gradient-to-br from-[#2777df] to-[#fc4d16] flex items-center justify-center text-white font-black text-xs cursor-pointer flex-shrink-0 focus:outline-none overflow-hidden"
                   >
                     {user?.avatar ? (
@@ -340,15 +349,14 @@ export function Sidebar({ active = "Fil d'actualité" }) {
   const items = isAdmin ? [...SIDEBAR_ITEMS, { label: 'Admin Panel', hash: '#admin-dashboard', icon: <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg> }] : SIDEBAR_ITEMS;
 
   return (
-    <aside className="hidden lg:flex flex-col w-56 flex-shrink-0 py-4 pr-6">
+    <aside className="hidden lg:flex flex-col w-48 flex-shrink-0 py-4 pr-6 ml-[10px]">
       <div className="space-y-1">
         {items.map(item => {
           const isActive = active === item.label;
           return (
             <a key={item.label}
               href={item.hash}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-bold transition-all w-full text-left
-                ${isActive ? 'bg-[#2777df] text-white shadow-lg shadow-[#2777df]/20' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}`}>
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300 ease-in-out w-full text-left hover:scale-[1.02] active:scale-[0.98] ${isActive ? 'bg-[#2777df] text-white shadow-lg shadow-[#2777df]/20' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}`}>
               {item.icon}
               {item.label}
             </a>
@@ -400,56 +408,10 @@ export function RightSidebar() {
 
   return (
     <aside className="hidden xl:flex flex-col w-64 flex-shrink-0 space-y-4 py-4 pl-6">
-      <div className="bg-gradient-to-br from-[#2777df] to-[#185db4] rounded-2xl p-3 text-white shadow-lg shadow-blue-500/20">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[9px] font-black uppercase tracking-wider opacity-70">Votre Solde</p>
-            <p className="text-base font-black">{balance} DT</p>
-          </div>
-          <button onClick={() => setShowRecharge(true)} className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-[9px] font-black transition-all">
-            Recharger
-          </button>
-        </div>
-      </div>
+     
 
-      <div className="bg-white rounded-3xl border border-gray-100 p-4 shadow-sm">
-        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">LinkBook</div>
-        <div className="flex gap-3 mb-3">
-          <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-            <svg className="h-6 w-6 text-[#2777df]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-          </div>
-          <div>
-            <div className="text-sm font-bold text-gray-900">Plateforme étudiante</div>
-            <div className="text-xs text-gray-400">Tunisie</div>
-          </div>
-        </div>
-        <p className="text-xs text-gray-400 leading-relaxed">
-          {booksCount > 0 ? `${booksCount} livres disponibles sur LinkBook` : 'Échangez, vendez ou donnez vos livres scolaires'}
-        </p>
-        <a href="#pricing" className="mt-3 block w-full text-center py-2 bg-[#2777df]/5 hover:bg-[#2777df] text-[#2777df] hover:text-white rounded-xl text-xs font-bold transition-all">
-          Voir les offres
-        </a>
-      </div>
 
-      <div className="bg-white rounded-3xl border border-gray-100 p-4 shadow-sm">
-        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Abonnement</div>
-        <div className="flex gap-3 items-center">
-          <div className={`h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isSubscribed ? 'bg-emerald-50' : 'bg-orange-50'}`}>
-            {isSubscribed ? (
-              <svg className="h-6 w-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            ) : (
-              <svg className="h-6 w-6 text-[#fc4d16]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-            )}
-          </div>
-          <div>
-            <div className="text-sm font-bold text-gray-900">{isSubscribed ? '✅ Pro • Illimité' : '⚠️ Accès limité'}</div>
-            <div className="text-xs text-gray-400">{isSubscribed ? '10 DT/an' : 'Abonnez-vous'}</div>
-          </div>
-        </div>
-        <a href="#pricing" className={`mt-3 block w-full text-center py-2 rounded-xl text-xs font-bold transition-all ${isSubscribed ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 'bg-[#fc4d16]/10 hover:bg-[#fc4d16] text-[#fc4d16] hover:text-white'}`}>
-          {isSubscribed ? 'Gérer' : 'Devenir Pro'}
-        </a>
-      </div>
+
 
       {showRecharge && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -489,8 +451,8 @@ export function RightSidebar() {
 export function FeedLayout({ children, active, title }) {
   return (
     <div className="min-h-screen bg-[#f4f7fc]" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <Navbar />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 flex">
+      <Navbar sidebarLayout />
+      <div className="flex pt-6 pb-12">
         <Sidebar active={active} />
         <main className="flex-1 min-w-0">
           {title && (
@@ -508,7 +470,7 @@ export function FeedLayout({ children, active, title }) {
 
 // ─── Category Filter Pills ──────────────────────────────────────
 export function CategoryFilter({ active, setActive }) {
-  const cats = ['Tout', 'Étudiant', 'Société', 'Grossiste', 'Espace culturel'];
+  const cats = ['Tout'];
   return (
     <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
       {cats.map(c => (
@@ -526,8 +488,8 @@ export function CategoryFilter({ active, setActive }) {
 export function OfferCard({ img, title, desc, price, location, tag, onAction, actionLabel = 'Consultez' }) {
   return (
     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
-      <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden cursor-pointer" onClick={onAction}>
-        <img src={img} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+      <div className="relative aspect-square bg-gray-100 overflow-hidden cursor-pointer" onClick={onAction}>
+        <img src={img} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { if (!e.target.dataset.failed) { e.target.dataset.failed = '1'; e.target.src = '/images/3768ec8e8ce95737a750cad65a6be4ef.jpg'; } }} />
         {tag && <span className="absolute top-3 left-3 px-2.5 py-1 bg-[#2777df] text-white text-xs font-bold rounded-full pointer-events-none">{tag}</span>}
       </div>
       <div className="p-4">

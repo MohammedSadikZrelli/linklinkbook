@@ -83,13 +83,13 @@ export default function MyOffers() {
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <CategoryFilter active={filter} setActive={setFilter} />
         <div className="flex gap-2">
-          <button onClick={() => setView('grid')} className={`p-2 rounded-xl transition-all ${view === 'grid' ? 'bg-[#2777df] text-white' : 'bg-white text-gray-400 border border-gray-200'}`}>
+          <button onClick={() => setView('grid')} className={`p-2 rounded-xl transition-all ${view === 'grid' ? 'bg-brand-blue text-white shadow-glow-blue' : 'bg-white text-gray-400 border border-gray-200'}`}>
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
           </button>
-          <button onClick={() => setView('list')} className={`p-2 rounded-xl transition-all ${view === 'list' ? 'bg-[#2777df] text-white' : 'bg-white text-gray-400 border border-gray-200'}`}>
+          <button onClick={() => setView('list')} className={`p-2 rounded-xl transition-all ${view === 'list' ? 'bg-brand-blue text-white shadow-glow-blue' : 'bg-white text-gray-400 border border-gray-200'}`}>
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
           </button>
-          <button onClick={() => window.location.hash = '#create-offer'} className="px-4 py-2 bg-[#2777df] text-white text-xs font-bold rounded-xl hover:bg-[#185db4] transition-colors flex items-center gap-1.5">
+          <button onClick={() => window.location.hash = '#create-offer'} className="px-4 py-2 bg-brand-blue text-white shadow-glow-blue text-xs font-bold rounded-xl hover:bg-[#185db4] transition-colors flex items-center gap-1.5">
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
             Nouvelle offre
           </button>
@@ -103,10 +103,10 @@ export default function MyOffers() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-gray-400 font-bold">Aucune offre trouvée</div>
       ) : view === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {filtered.map((b) => (
             <div key={b._id} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
-              <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
+              <div className="relative aspect-square bg-gray-100 overflow-hidden">
                 <div onClick={() => window.location.hash = `#offer-detail?id=${b._id}`} className="block w-full h-full cursor-pointer">
                   <img
                     src={b.images?.[0] || assetURL('9daa051ce6458b314a567b7df7c447a2.jpg')}
@@ -176,7 +176,7 @@ export default function MyOffers() {
                     </span>
                   </td>
                   <td className="py-3 px-4">
-                    <button onClick={() => window.location.hash = `#edit-offer?id=${b._id}`} className="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-[#2777df] text-white text-xs font-bold rounded-xl transition-all">Modifier</button>
+                    <button onClick={() => window.location.hash = `#edit-offer?id=${b._id}`} className="opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-brand-blue text-white shadow-glow-blue text-xs font-bold rounded-xl transition-all">Modifier</button>
                   </td>
                 </tr>
               ))}

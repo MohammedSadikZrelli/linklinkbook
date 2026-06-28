@@ -10,7 +10,7 @@ const enhanceImage = async (req, res, next) => {
 
     const inputPath = req.file.path;
     const ext = path.extname(req.file.originalname);
-    const outputName = `enhanced-${req.file.filename}`;
+    const outputName = `enhanced-${req.file.filename}`.replace(/\.(jfif|jfi|jpe|jif)$/i, '.jpg');
     const outputPath = path.join(__dirname, '..', 'uploads', outputName);
 
     const metadata = await sharp(inputPath).metadata();

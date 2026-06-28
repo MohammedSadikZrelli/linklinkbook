@@ -34,6 +34,7 @@ export default function CreateOffer() {
 
   const [form, setForm] = useState({ title: '', author: '', isbn: '', subject: '', level: '', condition: '', type: 'vente', price: '', description: '', location: '' });
   const [images, setImages] = useState([]);
+  const [previews, setPreviews] = useState([]);
   const [coverOptions, setCoverOptions] = useState(null);
   const [selectedCover, setSelectedCover] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -47,6 +48,11 @@ export default function CreateOffer() {
   const handleFiles = (files) => {
     const newFiles = Array.from(files);
     setImages(prev => [...prev, ...newFiles]);
+    newFiles.forEach(f => {
+      const reader = new FileReader();
+      reader.onload = (e) => setPreviews(prev => [...prev, e.target.result]);
+      reader.readAsDataURL(f);
+    });
   };
 
   const runAI = async () => {
@@ -208,7 +214,7 @@ export default function CreateOffer() {
                 )}
                 {images.map((f, i) => {
                   const isCover = i === 0 && selectedCover;
-                  const src = isCover ? selectedCover : URL.createObjectURL(f);
+                  const src = isCover ? selectedCover : previews[i];
                   return (
                     <div key={i} className="aspect-square rounded-2xl bg-gray-100 overflow-hidden relative group">
                       <img src={src} alt="" className="w-full h-full object-cover" />
@@ -217,6 +223,7 @@ export default function CreateOffer() {
                       )}
                       <button type="button" onClick={() => {
                         setImages(prev => prev.filter((_, j) => j !== i));
+                        setPreviews(prev => prev.filter((_, j) => j !== i));
                         if (i === 0) {
                           setCoverOptions(null);
                           setSelectedCover('');

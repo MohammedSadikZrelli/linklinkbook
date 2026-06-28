@@ -138,7 +138,7 @@ export default function Messages() {
                   key={c._id} 
                   onClick={() => setActiveConversationId(c._id)}
                   className={`w-full p-4 flex gap-3 text-left transition-colors relative hover:bg-gray-50
-                    ${isActive ? 'bg-blue-50/50 border-l-4 border-[#2777df]' : ''}`}
+                    ${isActive ? 'bg-brand-blue/5 border-l-4 border-brand-blue shadow-sm' : ''}`}
                 >
                   <div className="h-12 w-12 rounded-full bg-gradient-to-br from-[#2777df] to-[#fc4d16] text-white flex items-center justify-center font-black text-sm shadow-inner flex-shrink-0 overflow-hidden">
                     {other?.avatar ? <img src={other.avatar} className="h-full w-full object-cover" alt="" /> : getInitials(other?.name)}
@@ -273,7 +273,7 @@ export default function Messages() {
             </>
           ) : (
             <div className="flex flex-col items-center justify-center flex-1 text-gray-400 font-semibold p-8 text-center bg-slate-50/10">
-              <div className="h-20 w-20 bg-blue-50 text-[#2777df] rounded-full flex items-center justify-center mb-6">
+              <div className="h-20 w-20 bg-brand-blue/5 text-brand-blue rounded-full flex items-center justify-center mb-6">
                 <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>

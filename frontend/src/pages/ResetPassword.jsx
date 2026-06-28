@@ -39,10 +39,9 @@ export default function ResetPassword({ query = {} }) {
         style={{ backgroundImage: "url('/images/3768ec8e8ce95737a750cad65a6be4ef.jpg')" }}
       >
         <div className="absolute inset-0 bg-gradient-to-tr from-[#185db4]/90 via-[#2777df]/65 to-transparent z-0"></div>
-        <div className="relative z-10 flex items-center gap-3">
-          <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-10 w-auto object-contain brightness-0 invert" alt="Linkbook" />
-          <span className="text-white font-black text-2xl tracking-wide">Linkbook</span>
-        </div>
+          <div className="relative z-10 flex items-center gap-3">
+            <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-10 w-auto object-contain brightness-0 invert" alt="Linkbook" />
+          </div>
         <div className="relative z-10 bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 max-w-md shadow-2xl">
           <span className="inline-block bg-[#fc4d16]/30 text-orange-200 text-xs px-3 py-1 rounded-full font-bold tracking-wider uppercase mb-4">
             Nouveau mot de passe

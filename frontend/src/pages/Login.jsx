@@ -36,11 +36,10 @@ export default function Login() {
         {/* Overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-tr from-[#185db4]/90 via-[#2777df]/70 to-[#2777df]/30 z-0"></div>
 
-        {/* Brand Header */}
-        <div className="relative z-10 flex items-center gap-3">
-          <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-10 w-auto object-contain brightness-0 invert" alt="Linkbook Logo" />
-          <span className="text-white font-black text-2xl tracking-wide">Linkbook</span>
-        </div>
+{/* Brand Header */}
+         <div className="relative z-10 flex items-center gap-3">
+            <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-10 w-auto object-contain brightness-0 invert" alt="Linkbook Logo" />
+          </div>
 
         {/* Brand Slogan / Glass Card */}
         <div className="relative z-10 bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 max-w-xl shadow-2xl">
@@ -73,14 +72,14 @@ export default function Login() {
         {/* Form Container */}
         <div className="w-full max-w-md flex flex-col items-center">
           
-          {/* Logo & Headings */}
-          <div className="flex flex-col items-center text-center mb-8">
-            <div className="h-16 w-16 p-3 rounded-2xl bg-[#2777df]/5 flex items-center justify-center mb-4">
-              <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-10 w-auto object-contain" alt="Linkbook" />
-            </div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Connexion</h1>
-            <p className="text-sm text-gray-500 mt-2 font-medium">Bienvenue sur notre plateforme</p>
-          </div>
+{/* Logo & Headings */}
+           <div className="flex flex-col items-center text-center mb-8">
+             <div className="h-16 w-16 p-3 rounded-2xl bg-[#2777df]/5 flex items-center justify-center mb-4">
+               <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-10 w-auto object-contain" alt="Linkbook" />
+             </div>
+             <h1 className="text-3xl font-black text-gray-900 tracking-tight">Connexion</h1>
+             <p className="text-sm text-gray-500 mt-2 font-medium">Bienvenue sur notre plateforme</p>
+           </div>
 
           {/* Login Form */}
           <form className="w-full" onSubmit={handleSubmit}>

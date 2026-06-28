@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar, OfferCard } from '../layouts/SharedLayout';
+import logoImg from '../assets/logo.png';
 
 const API_BASE = 'http://localhost:5000/api';
 
@@ -15,8 +16,9 @@ export default function HomePage() {
       })
       .catch(() => {});
 
+    const token = localStorage.getItem('linkbook_token');
     fetch(`${API_BASE}/admin/stats`, {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('linkbook_token')}` }
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
     })
       .then(r => r.json())
       .then(res => {
@@ -27,12 +29,12 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans" style={{ fontFamily: "'Inter', sans-serif" }}>
-      {/* Navbar overlay */}
-      <Navbar transparent={false} />
+{/* Navbar overlay */}
+       <Navbar transparent={false} logoBackground="white" />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-[#2777df]/10 via-white to-slate-50 pt-24 pb-16 md:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
             {/* Left Content */}
@@ -51,13 +53,13 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                 <button 
                   onClick={() => window.location.hash = '#register'}
-                  className="w-full sm:w-auto px-8 py-4 bg-[#fc4d16] hover:bg-[#e03d0d] text-white font-extrabold rounded-2xl shadow-lg shadow-orange-500/20 active:scale-95 transition-all text-sm"
+                  className="btn-brand w-full sm:w-auto px-8 py-4 text-sm"
                 >
                   Commencer Gratuitement
                 </button>
                 <button
                   onClick={() => window.location.hash = '#timeline'}
-                  className="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 hover:border-[#2777df] text-slate-700 hover:text-[#2777df] font-bold rounded-2xl shadow-sm active:scale-95 transition-all text-sm"
+                  className="btn-outline w-full sm:w-auto px-8 py-4 text-sm"
                 >
                   Explorer les Offres
                 </button>
@@ -147,14 +149,14 @@ export default function HomePage() {
               </select>
             </div>
           </div>
-          <button 
-            onClick={() => {
-              const type = document.getElementById('hp-type').value;
-              const wilaya = document.getElementById('hp-wilaya').value;
-              window.location.hash = `#searchresults?type=${type}&wilaya=${wilaya}`;
-            }}
-            className="w-full md:w-auto px-8 py-3.5 bg-[#2777df] hover:bg-[#185db4] text-white text-xs font-extrabold rounded-2xl transition-all shadow-md shadow-blue-500/20 active:scale-95"
-          >
+<button 
+             onClick={() => {
+               const type = document.getElementById('hp-type').value;
+               const wilaya = document.getElementById('hp-wilaya').value;
+               window.location.hash = `#searchresults?type=${type}&wilaya=${wilaya}`;
+             }}
+              className="w-full md:w-auto px-8 py-3.5 btn-brand text-xs"
+           >
             Rechercher
           </button>
         </div>
@@ -162,7 +164,7 @@ export default function HomePage() {
 
       {/* How it works Section */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-4">
               Comment ça fonctionne ?
@@ -174,7 +176,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
-            <div className="bg-slate-50/50 rounded-3xl border border-slate-100 p-8 text-center space-y-4 hover:shadow-md transition-shadow">
+            <div className="card-lift bg-white rounded-3xl border border-gray-100 shadow-card p-8 text-center space-y-4">
               <div className="h-16 w-16 bg-[#2777df]/10 text-[#2777df] rounded-2xl mx-auto flex items-center justify-center font-black text-xl shadow-inner">
                 1
               </div>
@@ -185,7 +187,7 @@ export default function HomePage() {
             </div>
 
             {/* Step 2 */}
-            <div className="bg-slate-50/50 rounded-3xl border border-slate-100 p-8 text-center space-y-4 hover:shadow-md transition-shadow">
+            <div className="card-lift bg-white rounded-3xl border border-gray-100 shadow-card p-8 text-center space-y-4">
               <div className="h-16 w-16 bg-[#fc4d16]/10 text-[#fc4d16] rounded-2xl mx-auto flex items-center justify-center font-black text-xl shadow-inner">
                 2
               </div>
@@ -196,7 +198,7 @@ export default function HomePage() {
             </div>
 
             {/* Step 3 */}
-            <div className="bg-slate-50/50 rounded-3xl border border-slate-100 p-8 text-center space-y-4 hover:shadow-md transition-shadow">
+            <div className="card-lift bg-white rounded-3xl border border-gray-100 shadow-card p-8 text-center space-y-4">
               <div className="h-16 w-16 bg-green-50 text-green-600 rounded-2xl mx-auto flex items-center justify-center font-black text-xl shadow-inner">
                 3
               </div>
@@ -211,7 +213,7 @@ export default function HomePage() {
 
       {/* Featured Books Section */}
       <section className="py-20 bg-[#f4f7fc]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-4">
               Annonces Récentes
@@ -222,7 +224,7 @@ export default function HomePage() {
           </div>
 
           {featuredBooks.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {featuredBooks.map(book => (
                 <OfferCard
                   key={book._id}
@@ -237,16 +239,26 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-400 font-bold">Aucune annonce pour le moment</p>
-              <p className="text-xs text-gray-300 mt-1">Soyez le premier à publier !</p>
+            <div className="animate-fade-in flex flex-col items-center justify-center py-16 text-center">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-100 text-gray-300">
+                <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-black text-gray-900">Aucune annonce pour le moment</h3>
+              <p className="mt-2 max-w-sm text-sm text-gray-400">
+                Soyez le premier à publier une offre et rejoignez la communauté Linkbook.
+              </p>
+              <a href="#create-offer" className="btn-brand mt-6">
+                Créer une offre
+              </a>
             </div>
           )}
 
           <div className="text-center mt-10">
             <button
               onClick={() => window.location.hash = '#timeline'}
-              className="px-8 py-3.5 bg-white border-2 border-[#2777df] text-[#2777df] hover:bg-[#2777df] hover:text-white font-bold rounded-2xl transition-all text-sm"
+              className="btn-outline px-8 py-3.5 text-sm"
             >
               Voir toutes les annonces
             </button>
@@ -254,28 +266,105 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer banner */}
-      <footer className="bg-slate-900 text-white py-12 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 border-b border-slate-800 pb-8 mb-8">
-            <div className="flex items-center gap-2">
-              <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-8 w-auto object-contain brightness-0 invert" alt="Linkbook" />
-              <span className="text-white font-black text-xl tracking-tight">Linkbook</span>
+      {/* Pro / Pricing Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="inline-block bg-[#2777df]/10 text-[#2777df] text-xs px-3.5 py-1.5 rounded-full font-extrabold tracking-wider uppercase mb-4">
+              Passer Pro
+            </span>
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-4">
+              Boostez vos Annonces
+            </h2>
+            <p className="text-slate-500 text-sm font-medium leading-relaxed">
+              Choisissez le pack qui correspond à vos besoins et maximisez vos chances d'échange.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="relative bg-white rounded-3xl border border-gray-100 shadow-card p-8 flex flex-col">
+              <h3 className="text-lg font-black text-gray-900 mb-2">Starter</h3>
+              <p className="text-sm text-gray-400 font-medium mb-6">Pour commencer en douceur</p>
+              <div className="mb-6">
+                <span className="text-4xl font-black text-gray-900">Gratuit</span>
+              </div>
+              <ul className="space-y-3 mb-8 flex-1">
+                {['3 annonces actives', 'Photos standard', 'Messagerie illimitée', 'Sans marque blanche'].map((f, i) => (
+                  <li key={i} className="flex items-center gap-3 text-sm text-gray-500 font-medium">
+                    <svg className="h-4 w-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={() => window.location.hash = '#register'} className="w-full py-3 border border-gray-200 text-gray-600 font-bold text-sm rounded-2xl hover:bg-gray-50 transition-all active:scale-[0.98]">
+                Commencer
+              </button>
             </div>
-            <nav className="flex flex-wrap justify-center gap-6">
-              <a href="#" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Accueil</a>
-              <a href="#timeline" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Shop</a>
-              <a href="#community" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Communauté</a>
-              <a href="#pricing" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Pack Promo</a>
-            </nav>
+
+            <div className="relative bg-gradient-to-b from-[#2777df] to-[#185db4] rounded-3xl shadow-xl shadow-[#2777df]/20 p-8 flex flex-col scale-105 border-2 border-[#2777df]">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#fc4d16] text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">Populaire</span>
+              <h3 className="text-lg font-black text-white mb-2">Pro</h3>
+              <p className="text-sm text-blue-200 font-medium mb-6">Le plus choisi</p>
+              <div className="mb-6">
+                <span className="text-4xl font-black text-white">9 DT</span>
+                <span className="text-blue-200 text-sm font-medium ml-1">/mois</span>
+              </div>
+              <ul className="space-y-3 mb-8 flex-1">
+                {['Annonces illimitées', 'Photos HD (IA)', 'Statistiques avancées', 'Badge Pro vérifié', 'Support prioritaire'].map((f, i) => (
+                  <li key={i} className="flex items-center gap-3 text-sm text-blue-100 font-medium">
+                    <svg className="h-4 w-4 text-green-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={() => window.location.hash = '#register'} className="w-full py-3 bg-white text-[#2777df] font-black text-sm rounded-2xl hover:bg-blue-50 transition-all active:scale-[0.98] shadow-lg">
+                Choisir Pro
+              </button>
+            </div>
+
+            <div className="relative bg-white rounded-3xl border border-gray-100 shadow-card p-8 flex flex-col">
+              <h3 className="text-lg font-black text-gray-900 mb-2">Premium</h3>
+              <p className="text-sm text-gray-400 font-medium mb-6">Pour les gros vendeurs</p>
+              <div className="mb-6">
+                <span className="text-4xl font-black text-gray-900">19 DT</span>
+                <span className="text-gray-400 text-sm font-medium ml-1">/mois</span>
+              </div>
+              <ul className="space-y-3 mb-8 flex-1">
+                {['Tout le pack Pro', 'Annonces en vedette', 'Mise en avant 7 jours', 'API revendeur', 'Compte dédié'].map((f, i) => (
+                  <li key={i} className="flex items-center gap-3 text-sm text-gray-500 font-medium">
+                    <svg className="h-4 w-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={() => window.location.hash = '#register'} className="w-full py-3 border border-gray-200 text-gray-600 font-bold text-sm rounded-2xl hover:bg-gray-50 transition-all active:scale-[0.98]">
+                Choisir Premium
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+{/* Footer banner */}
+       <footer className="bg-slate-900 text-white py-12 border-t border-slate-800">
+         <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
+           <div className="flex flex-col sm:flex-row items-center justify-between gap-6 border-b border-slate-800 pb-8 mb-8">
+              <div className="flex items-center gap-2">
+                <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-8 w-auto object-contain brightness-0 invert" alt="Linkbook" />
+              </div>
+             <nav className="flex flex-wrap justify-center gap-6">
+               {/* <a href="#timeline" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Shop</a>
+               <a href="#community" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Communauté</a>
+               <a href="#pricing" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Pack Promo</a> */}
+             </nav>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-[10px] text-slate-500 font-medium">
               Copyright © 2026 Linkbook. Tous droits réservés.
             </p>
             <div className="flex gap-4">
-              <span className="text-[10px] text-slate-500 hover:text-slate-400 cursor-pointer">Conditions d'utilisation</span>
-              <span className="text-[10px] text-slate-500 hover:text-slate-400 cursor-pointer">Confidentialité</span>
+              <a href="#terms" className="text-[10px] text-slate-500 hover:text-slate-400 transition-colors">Conditions d'utilisation</a>
+              <a href="#privacy" className="text-[10px] text-slate-500 hover:text-slate-400 transition-colors">Confidentialité</a>
             </div>
           </div>
         </div>

@@ -86,10 +86,10 @@ export default function SearchResults({ query }) {
       ) : books.length === 0 ? (
         <div className="text-center py-16 text-gray-400 font-bold">Aucun résultat trouvé</div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {books.map(b => (
             <div key={b._id} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
-              <div className="relative h-44 bg-gray-100 overflow-hidden">
+              <div className="relative aspect-square bg-gray-100 overflow-hidden">
                 {b.images?.[0] ? (
                   <img src={b.images[0]} alt={b.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : (

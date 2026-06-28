@@ -89,6 +89,10 @@ function App() {
   });
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [route]);
+
+  useEffect(() => {
     const handleHashChange = () => {
       const raw = window.location.hash.replace(/^#\/?/, '');
       const parts = raw.split('?');

@@ -143,11 +143,10 @@ export default function Register() {
         className="relative hidden lg:flex lg:w-[45%] flex-col justify-between p-16 bg-cover bg-center overflow-hidden"
         style={{ backgroundImage: "url('/images/3768ec8e8ce95737a750cad65a6be4ef.jpg')" }}
       >
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#185db4]/90 via-[#2777df]/65 to-transparent z-0"></div>
-        <div className="relative z-10 flex items-center gap-3">
-          <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-10 w-auto object-contain brightness-0 invert" alt="Linkbook" />
-          <span className="text-white font-black text-2xl tracking-wide">Linkbook</span>
-        </div>
+<div className="absolute inset-0 bg-gradient-to-tr from-[#185db4]/90 via-[#2777df]/65 to-transparent z-0"></div>
+          <div className="relative z-10 flex items-center gap-3">
+            <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-10 w-auto object-contain brightness-0 invert" alt="Linkbook" />
+          </div>
         <div className="relative z-10 bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 max-w-md shadow-2xl">
           <span className="inline-block bg-[#fc4d16]/30 text-orange-200 text-xs px-3 py-1 rounded-full font-bold tracking-wider uppercase mb-4">
             Rejoignez nous
@@ -171,16 +170,16 @@ export default function Register() {
           Retour à l'accueil
         </a>
         
-        <div className="w-full max-w-md mt-8 lg:mt-0">
+<div className="w-full max-w-md mt-8 lg:mt-0">
 
-          {/* Header */}
-          <div className="flex flex-col items-center text-center mb-8">
-            <div className="h-14 w-14 p-2.5 rounded-2xl bg-[#2777df]/5 flex items-center justify-center mb-4">
-              <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-9 w-auto object-contain" alt="Linkbook" />
-            </div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">S'inscrire</h1>
-            <p className="text-sm text-gray-500 mt-2 font-medium">Bienvenue sur notre plateforme</p>
-          </div>
+           {/* Header */}
+           <div className="flex flex-col items-center text-center mb-8">
+             <div className="h-14 w-14 p-2.5 rounded-2xl bg-[#2777df]/5 flex items-center justify-center mb-4">
+               <img src="/images/d59019ab7cc7759b758acfe6f8e6c521.png" className="h-9 w-auto object-contain" alt="Linkbook" />
+             </div>
+             <h1 className="text-3xl font-black text-gray-900 tracking-tight">S'inscrire</h1>
+             <p className="text-sm text-gray-500 mt-2 font-medium">Bienvenue sur notre plateforme</p>
+           </div>
 
           <form className="w-full" onSubmit={handleSubmit}>
 

@@ -34,7 +34,7 @@ module.exports = async (req, res, next) => {
 
       next();
     } catch (error) {
-      console.error(error);
+      console.error(`Auth error: ${error.message}`);
       return res.status(401).json({ success: false, message: 'Non autorisé, token invalide' });
     }
   }

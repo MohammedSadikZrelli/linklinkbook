@@ -34,7 +34,14 @@ const request = async (method, path, body = null) => {
   });
 
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Erreur serveur');
+  if (!res.ok) {
+    if (res.status === 401) {
+      clearToken();
+      clearUser();
+      window.location.hash = '#login';
+    }
+    throw new Error(data.message || 'Erreur serveur');
+  }
   return data;
 };
 
